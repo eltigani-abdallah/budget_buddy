@@ -6,15 +6,12 @@ import re
 import os
 import subprocess
 
-print("Module de connexion:", os.getcwd())
+print("Login Module:", os.getcwd())
 
-# Fonction pour valider le mot de passe selon les critères
+# Function to validate password based on security criteria
 def validate_password(password):
-    # Vérifie la longueur du mot de passe
     if len(password) < 10:
         return False
-
-    # Vérifie si le mot de passe contient au moins une majuscule, une minuscule, un chiffre et un caractère spécial
     if not re.search(r'[A-Z]', password):
         return False
     if not re.search(r'[a-z]', password):
@@ -23,10 +20,9 @@ def validate_password(password):
         return False
     if not re.search(r'[@$!%*?&]', password):
         return False
-
     return True
 
-# Fonction pour vérifier les identifiants lors de la connexion
+# Function to verify login credentials
 def verify_login(email, password):
     try:
         db = mysql.connector.connect(
@@ -48,15 +44,17 @@ def verify_login(email, password):
         print(f"Error: {e}")
         return False
 
-# Fonction d'inscription avec validation et hachage du mot de passe
-def register_user(nom, prenom, email, mot_de_passe):
-    # Valider le mot de passe
-    if not validate_password(mot_de_passe):
-        messagebox.showerror("Erreur", "Le mot de passe ne respecte pas les critères de sécurité.")
+# Function for user registration with password validation and hashing
+def register_user(first_name, last_name, email, password, confirm_password):
+    if not validate_password(password):
+        messagebox.showerror("Error", "The password does not meet security requirements.")
+        return
+    
+    if password != confirm_password:
+        messagebox.showerror("Error", "Passwords do not match.")
         return
 
     try:
-        # Connexion à la base de données
         db = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -64,110 +62,118 @@ def register_user(nom, prenom, email, mot_de_passe):
             database="boom_budget",
         )
         cursor = db.cursor()
-
-        # Vérifier si l'email existe déjà
         cursor.execute("SELECT id FROM utilisateurs WHERE email = %s", (email,))
         existing_user = cursor.fetchone()
 
         if existing_user:
-            messagebox.showerror("Erreur", "L'email est déjà utilisé. Veuillez en choisir un autre.")
+            messagebox.showerror("Error", "This email is already in use. Please choose another one.")
             cursor.close()
             db.close()
             return
 
-        # Hacher le mot de passe
-        hashed_password = bcrypt.hashpw(mot_de_passe.encode('utf-8'), bcrypt.gensalt())
-
-        # Inscrire l'utilisateur dans la base de données
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         cursor.execute("INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe) VALUES (%s, %s, %s, %s)",
-                    (nom, prenom, email, hashed_password))
+                    (first_name, last_name, email, hashed_password))
         db.commit()
         cursor.close()
         db.close()
 
-        messagebox.showinfo("Succès", "Utilisateur inscrit avec succès.")
+        messagebox.showinfo("Success", "User successfully registered.")
     except Exception as e:
         print(f"Error: {e}")
-        messagebox.showerror("Erreur", "Impossible d'inscrire l'utilisateur.")
+        messagebox.showerror("Error", "Unable to register the user.")
 
-# Fonction de gestion de la connexion
+# Login function
 def on_login():
-    email = entry1.get()  # Utiliser l'email pour se connecter
+    email = entry1.get()
     password = entry2.get()
 
     if verify_login(email, password):
-        messagebox.showinfo("Succès", "Connexion réussie !")
-        # Fermer la fenêtre de connexion
+        messagebox.showinfo("Success", "Login successful!")
         app.destroy()
-        # Lancer l'application principale (par exemple)
         backend_path = "login.py"
         try:
             subprocess.run(["python", backend_path])
         except Exception:
-            messagebox.showerror("Erreur", f"Fichier introuvable : {backend_path}")
+            messagebox.showerror("Error", f"File not found: {backend_path}")
     else:
-        messagebox.showerror("Erreur", "Email ou mot de passe incorrect")
+        messagebox.showerror("Error", "Incorrect email or password.")
 
-# Fonction de gestion de l'inscription
+# Registration function
 def on_register():
-    nom = entry_nom.get()
-    prenom = entry_prenom.get()
+    first_name = entry_first_name.get()
+    last_name = entry_last_name.get()
     email = entry_email.get()
-    mot_de_passe = entry_mdp.get()
+    password = entry_password.get()
+    confirm_password = entry_confirm_password.get()
 
-    if not nom or not prenom or not email or not mot_de_passe:
-        messagebox.showerror("Erreur", "Tous les champs sont requis.")
+    if not first_name or not last_name or not email or not password or not confirm_password:
+        messagebox.showerror("Error", "All fields are required.")
         return
 
-    # Appeler la fonction d'inscription
-    register_user(nom, prenom, email, mot_de_passe)
+    register_user(first_name, last_name, email, password, confirm_password)
 
-# Initialiser l'application
+# Function to toggle password visibility
+def toggle_password():
+    if check_var.get():
+        entry_password.configure(show="")
+        entry_confirm_password.configure(show="")
+    else:
+        entry_password.configure(show="*")
+        entry_confirm_password.configure(show="*")
+
+# Initialize the application
 app = ctk.CTk()
-app.geometry("400x500")
-app.title("Fenêtre d'inscription / Connexion")
+app.geometry("400x550")
+app.title("Sign Up / Login Window")
 
-# Configurer l'apparence et le thème de couleur
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
-# Créer les widgets pour la connexion
-frame_connexion = ctk.CTkFrame(master=app)
-frame_connexion.pack(pady=20, padx=60, fill="both", expand=True)
+# Login widgets
+frame_login = ctk.CTkFrame(master=app)
+frame_login.pack(pady=20, padx=60, fill="both", expand=True)
 
-label_connexion = ctk.CTkLabel(master=frame_connexion, text="LOGIN", font=("Helvetica", 24))
-label_connexion.pack(pady=12, padx=10)
+label_login = ctk.CTkLabel(master=frame_login, text="LOGIN", font=("Helvetica", 24))
+label_login.pack(pady=12, padx=10)
 
-entry1 = ctk.CTkEntry(master=frame_connexion, placeholder_text="Email")
+entry1 = ctk.CTkEntry(master=frame_login, placeholder_text="Email")
 entry1.pack(pady=12, padx=10)
 
-entry2 = ctk.CTkEntry(master=frame_connexion, placeholder_text="Password", show="*")
+entry2 = ctk.CTkEntry(master=frame_login, placeholder_text="Password", show="*")
 entry2.pack(pady=12, padx=10)
 
-button_connexion = ctk.CTkButton(master=frame_connexion, text="Se connecter", command=on_login)
-button_connexion.pack(pady=12, padx=10)
+button_login = ctk.CTkButton(master=frame_login, text="Login", command=on_login)
+button_login.pack(pady=12, padx=10)
 
-# Créer les widgets pour l'inscription
-frame_inscription = ctk.CTkFrame(master=app)
-frame_inscription.pack(pady=20, padx=60, fill="both", expand=True)
+# Sign-up widgets
+frame_signup = ctk.CTkFrame(master=app)
+frame_signup.pack(pady=20, padx=60, fill="both", expand=True)
 
-label_inscription = ctk.CTkLabel(master=frame_inscription, text="S'INSCRIRE", font=("Helvetica", 24))
-label_inscription.pack(pady=12, padx=10)
+label_signup = ctk.CTkLabel(master=frame_signup, text="SIGN UP", font=("Helvetica", 24))
+label_signup.pack(pady=12, padx=10)
 
-entry_nom = ctk.CTkEntry(master=frame_inscription, placeholder_text="Nom")
-entry_nom.pack(pady=12, padx=10)
+entry_first_name = ctk.CTkEntry(master=frame_signup, placeholder_text="First Name")
+entry_first_name.pack(pady=12, padx=10)
 
-entry_prenom = ctk.CTkEntry(master=frame_inscription, placeholder_text="Prénom")
-entry_prenom.pack(pady=12, padx=10)
+entry_last_name = ctk.CTkEntry(master=frame_signup, placeholder_text="Last Name")
+entry_last_name.pack(pady=12, padx=10)
 
-entry_email = ctk.CTkEntry(master=frame_inscription, placeholder_text="Email")
+entry_email = ctk.CTkEntry(master=frame_signup, placeholder_text="Email")
 entry_email.pack(pady=12, padx=10)
 
-entry_mdp = ctk.CTkEntry(master=frame_inscription, placeholder_text="Password", show="*")
-entry_mdp.pack(pady=12, padx=10)
+entry_password = ctk.CTkEntry(master=frame_signup, placeholder_text="Password", show="*")
+entry_password.pack(pady=12, padx=10)
 
-button_inscription = ctk.CTkButton(master=frame_inscription, text="S'inscrire", command=on_register)
-button_inscription.pack(pady=12, padx=10)
+entry_confirm_password = ctk.CTkEntry(master=frame_signup, placeholder_text="Confirm Password", show="*")
+entry_confirm_password.pack(pady=12, padx=10)
 
-# Lancer l'application
+# Checkbox to toggle password visibility
+check_var = ctk.BooleanVar()
+checkbox = ctk.CTkCheckBox(master=frame_signup, text="Show Password", variable=check_var, command=toggle_password)
+checkbox.pack(pady=5)
+
+button_signup = ctk.CTkButton(master=frame_signup, text="Sign Up", command=on_register)
+button_signup.pack(pady=12, padx=10)
+
 app.mainloop()
