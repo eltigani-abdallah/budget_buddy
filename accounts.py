@@ -49,7 +49,7 @@ def register_user(first_name, last_name, email, password, confirm_password):
     if not validate_password(password):
         messagebox.showerror("Error", "The password does not meet security requirements.")
         return
-    
+
     if password != confirm_password:
         messagebox.showerror("Error", "Passwords do not match.")
         return
@@ -129,6 +129,10 @@ app.title("Sign Up / Login Window")
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
+
+# Ajout du titre
+welcome_label = ctk.CTkLabel(master=app, text="Bienvenue dans votre banque, en toute simplicité. Boom_Budget", font=("Helvetica", 16, "bold"))
+welcome_label.pack(pady=10)
 
 # Login widgets
 frame_login = ctk.CTkFrame(master=app)
