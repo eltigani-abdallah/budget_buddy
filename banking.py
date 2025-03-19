@@ -12,7 +12,7 @@ import os
 
 load_dotenv()
 
-dbpassword = os.getenv("pass")
+dbpassword = os.getenv("PASS")
 
 # Connexion à la base de données MySQL
 conn = mysql.connector.connect(
