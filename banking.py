@@ -6,12 +6,19 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from plyer import notification
 import pandas as pd
 from tkinter import font as tkFont
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
+
+dbpassword = os.getenv("pass")
 
 # Connexion à la base de données MySQL
 conn = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="Parfait1313",
+    password=dbpassword,
     database="boom_budget"
 )
 cursor = conn.cursor()
