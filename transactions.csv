@@ -1,1 +1,11 @@
 ID,Référence,Description,Montant,Date,Type,Catégorie
+1,depot ,loyer,200.00,2025-03-19 10:55:00,Dépôt,loyer mois de mars
+2,gift ,your winner loto,200000.00,2025-03-19 10:59:46,Transfert,loto
+3,Virement,loyer,134.00,2025-03-19 11:41:35,Transfert,loyer du mois de mars
+4,Virement,loyer,134.00,2025-03-19 11:42:21,Dépôt,loyer du mois de mars
+5,paiement,loyer,150.00,2025-03-19 11:43:32,Transfert,mois de mars
+6,D35354KJ54f5,achat pc gamer,3000.00,2025-03-19 11:55:58,Transfert,PC
+7,D35354KJ54f5,achat pc gamer,3000.00,2025-03-19 11:56:11,Retrait,PC
+8,D35354KJ54f5,achat pc gamer,1600.00,2025-03-19 11:56:43,Retrait,PC
+9,D35354K54f5,ps5,500.00,2025-03-19 11:57:09,Retrait,playstation
+10,mr dupond,loyer du mois de mars,130.00,2025-03-19 13:57:20,Transfert,loyer

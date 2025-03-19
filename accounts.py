@@ -18,9 +18,10 @@ def validate_password(password):
         return False
     if not re.search(r'[0-9]', password):
         return False
-    if not re.search(r'[@$!%*?&]', password):
+    if not re.search(r'[@$!%*?_&]', password):  # Include underscore in the special characters
         return False
     return True
+
 
 # Function to verify login credentials
 def verify_login(email, password):
