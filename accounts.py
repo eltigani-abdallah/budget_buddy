@@ -5,6 +5,11 @@ import bcrypt
 import re
 import os
 import subprocess
+from dotenv import load_dotenv
+
+load_dotenv()
+
+dbpassword = os.getenv("pass")
 
 print("Login Module:", os.getcwd())
 
@@ -29,7 +34,7 @@ def verify_login(email, password):
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="Parfait1313",
+            password= dbpassword,
             database="boom_budget",
         )
         cursor = db.cursor()

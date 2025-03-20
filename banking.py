@@ -2,7 +2,111 @@ import customtkinter as ctk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import pandas as pd
+from tkinter import font as tkFont
+from dotenv import load_dotenv
+import os
 
+
+load_dotenv()
+
+dbpassword = os.getenv("PASS")
+
+# Connexion à la base de données MySQL
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password=dbpassword,
+    database="boom_budget"
+)
+cursor = conn.cursor()
+
+# Création de la table des transactions (si elle n'existe pas déjà)
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    reference VARCHAR(255) NOT NULL,
+    description TEXT,
+    amount DECIMAL(10, 2) NOT NULL,
+    date DATETIME NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    category VARCHAR(255)
+)
+''')
+conn.commit()
+
+# Fonction pour ajouter une transaction
+def add_transaction(reference, description, amount, transaction_type, category):
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cursor.execute('''
+    INSERT INTO transactions (reference, description, amount, date, type, category)
+    VALUES (%s, %s, %s, %s, %s, %s)
+    ''', (reference, description, amount, date, transaction_type, category))
+    conn.commit()
+
+# Fonction pour afficher toutes les transactions
+def display_transactions(filter_criteria=None):
+    query = "SELECT * FROM transactions"
+    conditions = []
+    params = []
+
+    if filter_criteria:
+        if 'date' in filter_criteria and filter_criteria['date']:
+            conditions.append("date = %s")
+            params.append(filter_criteria['date'])
+        if 'category' in filter_criteria and filter_criteria['category']:
+            conditions.append("category = %s")
+            params.append(filter_criteria['category'])
+        if 'type' in filter_criteria and filter_criteria['type']:
+            conditions.append("type = %s")
+            params.append(filter_criteria['type'])
+        if 'start_date' in filter_criteria and 'end_date' in filter_criteria:
+            if filter_criteria['start_date'] and filter_criteria['end_date']:
+                conditions.append("date BETWEEN %s AND %s")
+                params.extend([filter_criteria['start_date'], filter_criteria['end_date']])
+        if 'min_amount' in filter_criteria and 'max_amount' in filter_criteria:
+            if filter_criteria['min_amount'] and filter_criteria['max_amount']:
+                conditions.append("amount BETWEEN %s AND %s")
+                params.extend([filter_criteria['min_amount'], filter_criteria['max_amount']])
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        if 'sort' in filter_criteria and filter_criteria['sort']:
+            query += f" ORDER BY amount {filter_criteria['sort']}"
+
+    cursor.execute(query, params)
+    return cursor.fetchall()
+
+def calculate_balance():
+    # Solde initial fixé à 100,000 euros
+    initial_balance = 100000
+    # Ajout de 700 euros au solde initial
+    additional_amount = 800
+
+    cursor.execute("SELECT SUM(amount) FROM transactions WHERE type IN ('Dépôt', 'Transfert')")
+    total_income = cursor.fetchone()[0] or 0
+
+    cursor.execute("SELECT SUM(amount) FROM transactions WHERE type = 'Retrait'")
+    total_expenses = cursor.fetchone()[0] or 0
+
+    return initial_balance + additional_amount + total_income - total_expenses
+
+# Fonction pour obtenir les dépenses mensuelles
+def get_monthly_expenses():
+    cursor.execute('''
+    SELECT DATE_FORMAT(date, '%Y-%m') as month, SUM(amount)
+    FROM transactions
+    WHERE type = 'Retrait'
+    GROUP BY month
+    ''')
+    return cursor.fetchall()
+
+# Fonction pour vérifier les alertes
+def check_alerts():
+    balance = calculate_balance()
+    if balance < 0:
+        return "Attention : Vous êtes à découvert !"
+    return ""
+
+# Interface graphique avec customtkinter
 class FinanceManagerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
