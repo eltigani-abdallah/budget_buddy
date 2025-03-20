@@ -135,17 +135,17 @@ entry_date_to.grid(row=0, column=3, padx=10, pady=10)
 
 category_var = tk.StringVar()
 tk.Label(filter_frame, text="Category:").grid(row=1, column=0, padx=10, pady=10)
-category_menu = ttk.Combobox(filter_frame, textvariable=category_var, values=["", "Expense Categories","Entertainment & Leisure","Shopping","Food & Dining","bribe","Other Categories"])
+category_menu = ttk.Combobox(filter_frame, textvariable=category_var, values=["", "Bills","Leisure","Dining","Travels","Other Categories"])
 category_menu.grid(row=1, column=1, padx=10, pady=10)
 
 type_var = tk.StringVar()
 tk.Label(filter_frame, text="Transaction Type:").grid(row=1, column=2, padx=10, pady=10)
-type_menu = ttk.Combobox(filter_frame, textvariable=type_var, values=["", "withdrawal", "Transfer", "Deposit"])
+type_menu = ttk.Combobox(filter_frame, textvariable=type_var, values=["", "Withdrawal", "Transfer", "Deposit"])
 type_menu.grid(row=1, column=3, padx=10, pady=10)
 
 order_var = tk.StringVar()
 tk.Label(filter_frame, text="Sort by amount:").grid(row=2, column=0, padx=10, pady=10)
-order_menu = ttk.Combobox(filter_frame, textvariable=order_var, values=["", "asc", "desc"])
+order_menu = ttk.Combobox(filter_frame, textvariable=order_var, values=["", "ASC", "DESC"])
 order_menu.grid(row=2, column=1, padx=10, pady=10)
 
 search_button = tk.Button(filter_frame, text="Search Transactions", command=search_and_display)
