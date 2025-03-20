@@ -2,111 +2,7 @@ import customtkinter as ctk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import pandas as pd
-from tkinter import font as tkFont
-from dotenv import load_dotenv
-import os
 
-
-load_dotenv()
-
-dbpassword = os.getenv("PASS")
-
-# Connexion à la base de données MySQL
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password=dbpassword,
-    database="boom_budget"
-)
-cursor = conn.cursor()
-
-# Création de la table des transactions (si elle n'existe pas déjà)
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS transactions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    reference VARCHAR(255) NOT NULL,
-    description TEXT,
-    amount DECIMAL(10, 2) NOT NULL,
-    date DATETIME NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    category VARCHAR(255)
-)
-''')
-conn.commit()
-
-# Fonction pour ajouter une transaction
-def add_transaction(reference, description, amount, transaction_type, category):
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cursor.execute('''
-    INSERT INTO transactions (reference, description, amount, date, type, category)
-    VALUES (%s, %s, %s, %s, %s, %s)
-    ''', (reference, description, amount, date, transaction_type, category))
-    conn.commit()
-
-# Fonction pour afficher toutes les transactions
-def display_transactions(filter_criteria=None):
-    query = "SELECT * FROM transactions"
-    conditions = []
-    params = []
-
-    if filter_criteria:
-        if 'date' in filter_criteria and filter_criteria['date']:
-            conditions.append("date = %s")
-            params.append(filter_criteria['date'])
-        if 'category' in filter_criteria and filter_criteria['category']:
-            conditions.append("category = %s")
-            params.append(filter_criteria['category'])
-        if 'type' in filter_criteria and filter_criteria['type']:
-            conditions.append("type = %s")
-            params.append(filter_criteria['type'])
-        if 'start_date' in filter_criteria and 'end_date' in filter_criteria:
-            if filter_criteria['start_date'] and filter_criteria['end_date']:
-                conditions.append("date BETWEEN %s AND %s")
-                params.extend([filter_criteria['start_date'], filter_criteria['end_date']])
-        if 'min_amount' in filter_criteria and 'max_amount' in filter_criteria:
-            if filter_criteria['min_amount'] and filter_criteria['max_amount']:
-                conditions.append("amount BETWEEN %s AND %s")
-                params.extend([filter_criteria['min_amount'], filter_criteria['max_amount']])
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
-        if 'sort' in filter_criteria and filter_criteria['sort']:
-            query += f" ORDER BY amount {filter_criteria['sort']}"
-
-    cursor.execute(query, params)
-    return cursor.fetchall()
-
-def calculate_balance():
-    # Solde initial fixé à 100,000 euros
-    initial_balance = 100000
-    # Ajout de 700 euros au solde initial
-    additional_amount = 800
-
-    cursor.execute("SELECT SUM(amount) FROM transactions WHERE type IN ('Dépôt', 'Transfert')")
-    total_income = cursor.fetchone()[0] or 0
-
-    cursor.execute("SELECT SUM(amount) FROM transactions WHERE type = 'Retrait'")
-    total_expenses = cursor.fetchone()[0] or 0
-
-    return initial_balance + additional_amount + total_income - total_expenses
-
-# Fonction pour obtenir les dépenses mensuelles
-def get_monthly_expenses():
-    cursor.execute('''
-    SELECT DATE_FORMAT(date, '%Y-%m') as month, SUM(amount)
-    FROM transactions
-    WHERE type = 'Retrait'
-    GROUP BY month
-    ''')
-    return cursor.fetchall()
-
-# Fonction pour vérifier les alertes
-def check_alerts():
-    balance = calculate_balance()
-    if balance < 0:
-        return "Attention : Vous êtes à découvert !"
-    return ""
-
-# Interface graphique avec customtkinter
 class FinanceManagerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -213,6 +109,7 @@ class FinanceManagerApp(ctk.CTk):
         self.title("Gestionnaire de Finances")
         self.geometry("1000x700")
 
+        self.balance = 0  # Initial balance
         self.create_widgets()
         self.refresh_overview()
 
@@ -258,40 +155,43 @@ class FinanceManagerApp(ctk.CTk):
         self.search_frame = ctk.CTkFrame(self.transactions_tab)
         self.search_frame.pack(pady=10)
 
+        # Dates column
         self.date_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["date_label"])
         self.date_label.grid(row=0, column=0, padx=5, pady=5)
         self.date_entry = ctk.CTkEntry(self.search_frame)
         self.date_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        self.category_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["category_label"])
-        self.category_label.grid(row=0, column=2, padx=5, pady=5)
-        self.category_search_entry = ctk.CTkEntry(self.search_frame)
-        self.category_search_entry.grid(row=0, column=3, padx=5, pady=5)
-
-        self.type_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["type_label"])
-        self.type_label.grid(row=1, column=0, padx=5, pady=5)
-        self.type_entry = ctk.CTkEntry(self.search_frame)
-        self.type_entry.grid(row=1, column=1, padx=5, pady=5)
-
         self.start_date_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["start_date_label"])
-        self.start_date_label.grid(row=1, column=2, padx=5, pady=5)
+        self.start_date_label.grid(row=1, column=0, padx=5, pady=5)
         self.start_date_entry = ctk.CTkEntry(self.search_frame)
-        self.start_date_entry.grid(row=1, column=3, padx=5, pady=5)
+        self.start_date_entry.grid(row=1, column=1, padx=5, pady=5)
 
         self.end_date_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["end_date_label"])
         self.end_date_label.grid(row=2, column=0, padx=5, pady=5)
         self.end_date_entry = ctk.CTkEntry(self.search_frame)
         self.end_date_entry.grid(row=2, column=1, padx=5, pady=5)
 
+        # Amounts column
         self.min_amount_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["min_amount_label"])
-        self.min_amount_label.grid(row=2, column=2, padx=5, pady=5)
+        self.min_amount_label.grid(row=0, column=2, padx=5, pady=5)
         self.min_amount_entry = ctk.CTkEntry(self.search_frame)
-        self.min_amount_entry.grid(row=2, column=3, padx=5, pady=5)
+        self.min_amount_entry.grid(row=0, column=3, padx=5, pady=5)
 
         self.max_amount_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["max_amount_label"])
-        self.max_amount_label.grid(row=3, column=0, padx=5, pady=5)
+        self.max_amount_label.grid(row=1, column=2, padx=5, pady=5)
         self.max_amount_entry = ctk.CTkEntry(self.search_frame)
-        self.max_amount_entry.grid(row=3, column=1, padx=5, pady=5)
+        self.max_amount_entry.grid(row=1, column=3, padx=5, pady=5)
+
+        # Other fields
+        self.category_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["category_label"])
+        self.category_label.grid(row=2, column=2, padx=5, pady=5)
+        self.category_search_entry = ctk.CTkEntry(self.search_frame)
+        self.category_search_entry.grid(row=2, column=3, padx=5, pady=5)
+
+        self.type_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["type_label"])
+        self.type_label.grid(row=3, column=0, padx=5, pady=5)
+        self.type_entry = ctk.CTkEntry(self.search_frame)
+        self.type_entry.grid(row=3, column=1, padx=5, pady=5)
 
         self.sort_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["sort_label"])
         self.sort_label.grid(row=3, column=2, padx=5, pady=5)
@@ -304,8 +204,6 @@ class FinanceManagerApp(ctk.CTk):
         self.transactions_listbox = ctk.CTkTextbox(self.transactions_tab, width=760, height=200)
         self.transactions_listbox.pack(pady=10)
 
-
-        # Widgets pour la page de vue d'ensemble
         self.balance_label = ctk.CTkLabel(self.overview_tab, text="", font=("Helvetica", 18))
         self.balance_label.pack(pady=10)
 
@@ -315,10 +213,6 @@ class FinanceManagerApp(ctk.CTk):
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(self.figure, self.overview_tab)
         self.canvas.get_tk_widget().pack(fill='both', expand=True)
-        # tout ça pour les graphiques de eltigani
-
-
-
 
         self.export_button = ctk.CTkButton(self.export_tab, text=self.translations[self.language]["export_button"], command=self.export_to_csv)
         self.export_button.pack(pady=20)
@@ -370,25 +264,19 @@ class FinanceManagerApp(ctk.CTk):
     def transfer(self):
         pass
 
-    # données pour les transaction pour yuliia
     def search_transactions(self):
         pass
 
     def refresh_transactions(self, filter_criteria=None):
         pass
 
-
-
-    # données pour le graphique pour elti
     def refresh_overview(self):
-        pass
-
-
-
+        self.balance += 800  # Add 300 euros to the balance
+        self.balance_label.configure(text=f"{self.translations[self.language]['balance_label']} {self.balance:.2f} €")
 
     def export_to_csv(self):
         transactions = []  # La liste des transactions sera remplie par votre collègue
-        df = pd.DataFrame(transactions, columns=['ID', 'Référence', 'Description', 'Montant', 'Date', 'Type', 'Catégorie'])
+        df = pd.DataFrame(transactions, columns=['ID', 'Référence', 'Description', 'Montant', 'Date', 'Type', 'Catégorie', 'Expéditeur''Bénéficiare'])
         df.to_csv('transactions.csv', index=False)
         print("Données exportées vers transactions.csv")
 
