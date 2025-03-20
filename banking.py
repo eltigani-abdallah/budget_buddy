@@ -1,116 +1,16 @@
 import customtkinter as ctk
-import mysql.connector
-from datetime import datetime
-import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from plyer import notification
+import matplotlib.pyplot as plt
 import pandas as pd
-from tkinter import font as tkFont
 
-# Connexion à la base de données MySQL
-conn = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="Parfait1313",
-    database="boom_budget"
-)
-cursor = conn.cursor()
-
-# Création de la table des transactions (si elle n'existe pas déjà)
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS transactions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    reference VARCHAR(255) NOT NULL,
-    description TEXT,
-    amount DECIMAL(10, 2) NOT NULL,
-    date DATETIME NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    category VARCHAR(255)
-)
-''')
-conn.commit()
-
-# Fonction pour ajouter une transaction
-def add_transaction(reference, description, amount, transaction_type, category):
-    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cursor.execute('''
-    INSERT INTO transactions (reference, description, amount, date, type, category)
-    VALUES (%s, %s, %s, %s, %s, %s)
-    ''', (reference, description, amount, date, transaction_type, category))
-    conn.commit()
-
-# Fonction pour afficher toutes les transactions
-def display_transactions(filter_criteria=None):
-    query = "SELECT * FROM transactions"
-    conditions = []
-    params = []
-
-    if filter_criteria:
-        if 'date' in filter_criteria and filter_criteria['date']:
-            conditions.append("date = %s")
-            params.append(filter_criteria['date'])
-        if 'category' in filter_criteria and filter_criteria['category']:
-            conditions.append("category = %s")
-            params.append(filter_criteria['category'])
-        if 'type' in filter_criteria and filter_criteria['type']:
-            conditions.append("type = %s")
-            params.append(filter_criteria['type'])
-        if 'start_date' in filter_criteria and 'end_date' in filter_criteria:
-            if filter_criteria['start_date'] and filter_criteria['end_date']:
-                conditions.append("date BETWEEN %s AND %s")
-                params.extend([filter_criteria['start_date'], filter_criteria['end_date']])
-        if 'min_amount' in filter_criteria and 'max_amount' in filter_criteria:
-            if filter_criteria['min_amount'] and filter_criteria['max_amount']:
-                conditions.append("amount BETWEEN %s AND %s")
-                params.extend([filter_criteria['min_amount'], filter_criteria['max_amount']])
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
-        if 'sort' in filter_criteria and filter_criteria['sort']:
-            query += f" ORDER BY amount {filter_criteria['sort']}"
-
-    cursor.execute(query, params)
-    return cursor.fetchall()
-
-def calculate_balance():
-    # Solde initial fixé à 100,000 euros
-    initial_balance = 100000
-    # Ajout de 700 euros au solde initial
-    additional_amount = 800
-
-    cursor.execute("SELECT SUM(amount) FROM transactions WHERE type IN ('Dépôt', 'Transfert')")
-    total_income = cursor.fetchone()[0] or 0
-
-    cursor.execute("SELECT SUM(amount) FROM transactions WHERE type = 'Retrait'")
-    total_expenses = cursor.fetchone()[0] or 0
-
-    return initial_balance + additional_amount + total_income - total_expenses
-
-# Fonction pour obtenir les dépenses mensuelles
-def get_monthly_expenses():
-    cursor.execute('''
-    SELECT DATE_FORMAT(date, '%Y-%m') as month, SUM(amount)
-    FROM transactions
-    WHERE type = 'Retrait'
-    GROUP BY month
-    ''')
-    return cursor.fetchall()
-
-# Fonction pour vérifier les alertes
-def check_alerts():
-    balance = calculate_balance()
-    if balance < 0:
-        return "Attention : Vous êtes à découvert !"
-    return ""
-
-# Interface graphique avec customtkinter
 class FinanceManagerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        ctk.set_appearance_mode("dark")  # Définir le mode sombre
-        ctk.set_default_color_theme("dark-blue")  # Définir le thème bleu foncé
+        ctk.set_appearance_mode("dark")
+        ctk.set_default_color_theme("dark-blue")
 
-        self.language = "français"  # Langue par défaut
+        self.language = "français"
         self.translations = {
             "français": {
                 "title": "Gestionnaire de Finances",
@@ -213,7 +113,6 @@ class FinanceManagerApp(ctk.CTk):
         self.refresh_overview()
 
     def create_widgets(self):
-        # Ajouter un menu déroulant pour la sélection de la langue
         self.language_menu = ctk.CTkOptionMenu(self, values=["français", "anglais", "russe", "coréen"], command=self.change_language)
         self.language_menu.pack(anchor="ne", pady=10, padx=10)
         self.language_menu.set(self.language)
@@ -226,15 +125,11 @@ class FinanceManagerApp(ctk.CTk):
         self.export_tab = self.notebook.add("Exportation")
         self.notifications_tab = self.notebook.add("Notifications")
 
-        # Charger la police personnalisée
-        custom_font_path = "budget_buddy/KalniaGlaze-VariableFont_wdth,wght.ttf"
         custom_font = ctk.CTkFont(family="KalniaGlaze-VariableFont_wdth,wght", size=24)
 
-        # le nom de la banque au-dessus du bouton "Transfert"
         self.bank_name_label = ctk.CTkLabel(self.transactions_tab, text="Boom_Budget", font=custom_font)
         self.bank_name_label.pack(pady=10)
 
-        # Widgets des transactions
         self.reference_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=self.translations[self.language]["reference_placeholder"])
         self.reference_entry.pack(pady=5)
 
@@ -305,6 +200,7 @@ class FinanceManagerApp(ctk.CTk):
         self.transactions_listbox = ctk.CTkTextbox(self.transactions_tab, width=760, height=200)
         self.transactions_listbox.pack(pady=10)
 
+
         # Widgets pour la page de vue d'ensemble
         self.balance_label = ctk.CTkLabel(self.overview_tab, text="", font=("Helvetica", 18))
         self.balance_label.pack(pady=10)
@@ -315,16 +211,17 @@ class FinanceManagerApp(ctk.CTk):
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvasTkAgg(self.figure, self.overview_tab)
         self.canvas.get_tk_widget().pack(fill='both', expand=True)
+        # tout ça pour les graphiques de eltigani
 
-        # Widgets pour la page d'exportation
+
+
+
         self.export_button = ctk.CTkButton(self.export_tab, text=self.translations[self.language]["export_button"], command=self.export_to_csv)
         self.export_button.pack(pady=20)
 
-        # Widgets pour la page des notifications
         self.check_alerts_button = ctk.CTkButton(self.notifications_tab, text=self.translations[self.language]["check_alerts_button"], command=self.check_and_notify_alerts)
         self.check_alerts_button.pack(pady=20)
 
-        # Ajout d'un menu pour changer de thème
         self.theme_menu = ctk.CTkOptionMenu(self, values=["dark", "light"], command=self.change_theme)
         self.theme_menu.pack(pady=10)
         self.theme_menu.set("dark")
@@ -361,88 +258,39 @@ class FinanceManagerApp(ctk.CTk):
         self.category_entry.configure(placeholder_text=translations["category_placeholder"])
 
     def deposit(self):
-        self.add_transaction("Dépôt")
+        pass
 
     def withdraw(self):
-        self.add_transaction("Retrait")
+        pass
 
     def transfer(self):
-        self.add_transaction("Transfert")
+        pass
 
-    def add_transaction(self, transaction_type):
-        reference = self.reference_entry.get()
-        description = self.description_entry.get()
-        amount_text = self.amount_entry.get()
-        category = self.category_entry.get()
-
-        if reference and description and amount_text and category:
-            try:
-                amount = float(amount_text)
-                add_transaction(reference, description, amount, transaction_type, category)
-                self.refresh_transactions()
-                self.refresh_overview()  # Mettre à jour le graphique après chaque transaction
-            except ValueError:
-                print("Montant invalide")
-
+    # données pour les transaction pour yuliia
     def search_transactions(self):
-        filter_criteria = {
-            'date': self.date_entry.get(),
-            'category': self.category_search_entry.get(),
-            'type': self.type_entry.get(),
-            'start_date': self.start_date_entry.get(),
-            'end_date': self.end_date_entry.get(),
-            'min_amount': self.min_amount_entry.get(),
-            'max_amount': self.max_amount_entry.get(),
-            'sort': self.sort_entry.get()
-        }
-        self.refresh_transactions(filter_criteria)
+        pass
 
     def refresh_transactions(self, filter_criteria=None):
-        transactions = display_transactions(filter_criteria)
-        self.transactions_listbox.delete("1.0", ctk.END)
-        for transaction in transactions:
-            self.transactions_listbox.insert(ctk.END, f"{transaction}\n")
+        pass
 
+
+
+    # données pour le graphique pour elti
     def refresh_overview(self):
-        balance = calculate_balance()
-        self.balance_label.configure(text=f"{self.translations[self.language]['balance_label']} {balance:.2f} €")
+        pass
 
-        alert = check_alerts()
-        self.alert_label.configure(text=alert)
 
-        monthly_expenses = get_monthly_expenses()
-        months = [expense[0] for expense in monthly_expenses]
-        amounts = [expense[1] for expense in monthly_expenses]
 
-        print("Months:", months)  # Debug print
-        print("Amounts:", amounts)  # Debug print
-
-        self.ax.clear()
-        self.ax.bar(months, amounts, color='blue')
-        self.ax.set_xlabel('Mois')
-        self.ax.set_ylabel('Dépenses')
-        self.ax.set_title('Dépenses Mensuelles')
-        self.canvas.draw()  # Redessiner le graphique
 
     def export_to_csv(self):
-        transactions = display_transactions()
+        transactions = []  # La liste des transactions sera remplie par votre collègue
         df = pd.DataFrame(transactions, columns=['ID', 'Référence', 'Description', 'Montant', 'Date', 'Type', 'Catégorie'])
         df.to_csv('transactions.csv', index=False)
         print("Données exportées vers transactions.csv")
 
     def check_and_notify_alerts(self):
-        alert_message = check_alerts()
-        if alert_message:
-            notification.notify(
-                title="Alerte Financière",
-                message=alert_message,
-                timeout=10
-            )
+        pass
 
-# Lancer l'application
 if __name__ == "__main__":
     app = FinanceManagerApp()
     app.mainloop()
-
-# Fermer la connexion à la base de données
-conn.close()
