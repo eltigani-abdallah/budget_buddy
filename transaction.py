@@ -1,4 +1,4 @@
-import mysql.connector
+import mysql.connector 
 from mysql.connector import Error
 import matplotlib.pyplot as plt
 import tkinter as tk
@@ -6,13 +6,20 @@ from tkinter import ttk
 from tkinter import messagebox
 from datetime import datetime
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+dbpassword = os.getenv("pass")
+
 # Function to establish a connection to the MySQL database
 def create_connection():
     try:
         connection = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="",
+            password= dbpassword,
             database="boom_budget"
         )
         if connection.is_connected():
@@ -93,9 +100,13 @@ def search_and_display():
 
     transactions = search_transactions(connection, date_from, date_to, category, trans_type, order_by)
 
-    listbox.delete(0, tk.END)
+    # Clear previous entries in Treeview
+    for row in tree.get_children():
+        tree.delete(row)
+
+    # Insert new transactions into Treeview
     for t in transactions:
-        listbox.insert(tk.END, f"{t['date']} - {t['amount']}€ - {t['category']} - {t['type']}")
+        tree.insert("", "end", values=(t['date'], t['amount'], t['category'], t['type']))
 
 # Function to display a graph of all transactions
 def show_graph():
@@ -108,40 +119,66 @@ connection = create_connection()
 # Tkinter Interface
 root = tk.Tk()
 root.title("Transaction Search")
-root.geometry("600x500")
+root.geometry("800x600")
 
-tk.Label(root, text="Date from (YYYY-MM-DD):").pack()
-entry_date_from = tk.Entry(root)
-entry_date_from.pack()
+# Filter Panel
+filter_frame = tk.Frame(root)
+filter_frame.pack(pady=50)  
 
-tk.Label(root, text="Date to (YYYY-MM-DD):").pack()
-entry_date_to = tk.Entry(root)
-entry_date_to.pack()
+tk.Label(filter_frame, text="Date from (YYYY-MM-DD):").grid(row=0, column=0, padx=10, pady=10)  
+entry_date_from = tk.Entry(filter_frame)
+entry_date_from.grid(row=0, column=1, padx=10, pady=10)
+
+tk.Label(filter_frame, text="Date to (YYYY-MM-DD):").grid(row=0, column=2, padx=10, pady=10)
+entry_date_to = tk.Entry(filter_frame)
+entry_date_to.grid(row=0, column=3, padx=10, pady=10)
 
 category_var = tk.StringVar()
-tk.Label(root, text="Category:").pack()
-category_menu = ttk.Combobox(root, textvariable=category_var, values=["", "loisir", "repas", "pot-de-vin"])
-category_menu.pack()
+tk.Label(filter_frame, text="Category:").grid(row=1, column=0, padx=10, pady=10)
+category_menu = ttk.Combobox(filter_frame, textvariable=category_var, values=["", "Expense Categories","Entertainment & Leisure","Shopping","Food & Dining","bribe","Other Categories"])
+category_menu.grid(row=1, column=1, padx=10, pady=10)
 
 type_var = tk.StringVar()
-tk.Label(root, text="Transaction Type:").pack()
-type_menu = ttk.Combobox(root, textvariable=type_var, values=["", "withdrawal", "payment"])
-type_menu.pack()
+tk.Label(filter_frame, text="Transaction Type:").grid(row=1, column=2, padx=10, pady=10)
+type_menu = ttk.Combobox(filter_frame, textvariable=type_var, values=["", "withdrawal", "Transfer", "Deposit"])
+type_menu.grid(row=1, column=3, padx=10, pady=10)
 
 order_var = tk.StringVar()
-tk.Label(root, text="Sort by amount:").pack()
-order_menu = ttk.Combobox(root, textvariable=order_var, values=["", "asc", "desc"])
-order_menu.pack()
+tk.Label(filter_frame, text="Sort by amount:").grid(row=2, column=0, padx=10, pady=10)
+order_menu = ttk.Combobox(filter_frame, textvariable=order_var, values=["", "asc", "desc"])
+order_menu.grid(row=2, column=1, padx=10, pady=10)
 
-search_button = tk.Button(root, text="Search Transactions", command=search_and_display)
-search_button.pack()
+search_button = tk.Button(filter_frame, text="Search Transactions", command=search_and_display)
+search_button.grid(row=2, column=2, padx=10, pady=10)
 
-graph_button = tk.Button(root, text="Show Graph", command=show_graph)
-graph_button.pack()
+graph_button = tk.Button(filter_frame, text="Show Graph", command=show_graph)
+graph_button.grid(row=2, column=3, padx=10, pady=10)
 
-listbox = tk.Listbox(root, width=80, height=10)
-listbox.pack()
 
+
+# Treeview for displaying transactions
+tree_frame = tk.Frame(root)
+tree_frame.pack(pady=10)
+
+tree = ttk.Treeview(tree_frame, columns=("Date", "Amount", "Category", "Type"), show="headings", selectmode="extended")
+tree.heading("Date", text="Date")
+tree.heading("Amount", text="Amount")
+tree.heading("Category", text="Category")
+tree.heading("Type", text="Type")
+
+tree.column("Date", width=100)
+tree.column("Amount", width=100)
+tree.column("Category", width=100)
+tree.column("Type", width=100)
+
+tree.pack(side=tk.LEFT)
+
+# Scrollbar for Treeview
+scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=tree.yview)
+tree.configure(yscrollcommand=scrollbar.set)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+# Start the main event loop
 root.mainloop()
 
 # Close the database connection when the application exits
