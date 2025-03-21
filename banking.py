@@ -7,40 +7,30 @@ import secrets
 import string
 
 class FinanceManagerApp(ctk.CTk):
+    """
+    Financial management application using CustomTkinter for the user interface.
+
+    Attributes:
+        language (str): Current language of the user interface.
+        translations (dict): Dictionary containing translations for each supported language.
+        accounts (dict): Dictionary containing account balances.
+        user_accounts (dict): Dictionary to store user accounts.
+        current_account (str): Currently selected account.
+    """
+
     def __init__(self):
+        """
+        Initializes the FinanceManagerApp application.
+        Configures the user interface, accounts, and translations.
+        """
         super().__init__()
 
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 
-        self.language = "français"
+        self.language = "french"
         self.translations = {
-            "français": {
-                "title": "Gestionnaire de Finances",
-                "balance_label": "Solde total :",
-                "alert_label": "Attention : Vous êtes à découvert !",
-                "deposit_button": "Dépôt",
-                "withdraw_button": "Retrait",
-                "transfer_button": "Transfert",
-                "search_button": "Rechercher",
-                "export_button": "Exporter vers CSV",
-                "check_alerts_button": "Vérifier les Alertes",
-                "date_label": "Date (YYYY-MM-DD):",
-                "category_label": "Catégorie:",
-                "type_label": "Type:",
-                "start_date_label": "Date de début (YYYY-MM-DD):",
-                "end_date_label": "Date de fin (YYYY-MM-DD):",
-                "min_amount_label": "Montant min:",
-                "max_amount_label": "Montant max:",
-                "sort_label": "Trier par montant:",
-                "reference_placeholder": "Référence",
-                "description_placeholder": "Description",
-                "amount_placeholder": "Montant",
-                "category_placeholder": "Catégorie",
-                "logout_button": "Déconnexion",
-                "account_label": "Compte bancaire :"
-            },
-            "anglais": {
+            "french": {
                 "title": "Finance Manager",
                 "balance_label": "Total Balance:",
                 "alert_label": "Warning: You are overdrawn!",
@@ -65,83 +55,107 @@ class FinanceManagerApp(ctk.CTk):
                 "logout_button": "Logout",
                 "account_label": "Bank Account:"
             },
-            "russe": {
-                "title": "Финансовый Менеджер",
-                "balance_label": "Общий баланс:",
-                "alert_label": "Внимание: Вы в минусе!",
-                "deposit_button": "Депозит",
-                "withdraw_button": "Снятие",
-                "transfer_button": "Перевод",
-                "search_button": "Поиск",
-                "export_button": "Экспорт в CSV",
-                "check_alerts_button": "Проверить оповещения",
-                "date_label": "Дата (ГГГГ-ММ-ДД):",
-                "category_label": "Категория:",
-                "type_label": "Тип:",
-                "start_date_label": "Дата начала (ГГГГ-ММ-ДД):",
-                "end_date_label": "Дата окончания (ГГГГ-ММ-ДД):",
-                "min_amount_label": "Мин. сумма:",
-                "max_amount_label": "Макс. сумма:",
-                "sort_label": "Сортировать по сумме:",
-                "reference_placeholder": "Ссылка",
-                "description_placeholder": "Описание",
-                "amount_placeholder": "Сумма",
-                "category_placeholder": "Категория",
-                "logout_button": "Выход",
-                "account_label": "Банковский счет:"
+            "english": {
+                "title": "Finance Manager",
+                "balance_label": "Total Balance:",
+                "alert_label": "Warning: You are overdrawn!",
+                "deposit_button": "Deposit",
+                "withdraw_button": "Withdraw",
+                "transfer_button": "Transfer",
+                "search_button": "Search",
+                "export_button": "Export to CSV",
+                "check_alerts_button": "Check Alerts",
+                "date_label": "Date (YYYY-MM-DD):",
+                "category_label": "Category:",
+                "type_label": "Type:",
+                "start_date_label": "Start Date (YYYY-MM-DD):",
+                "end_date_label": "End Date (YYYY-MM-DD):",
+                "min_amount_label": "Min Amount:",
+                "max_amount_label": "Max Amount:",
+                "sort_label": "Sort by Amount:",
+                "reference_placeholder": "Reference",
+                "description_placeholder": "Description",
+                "amount_placeholder": "Amount",
+                "category_placeholder": "Category",
+                "logout_button": "Logout",
+                "account_label": "Bank Account:"
             },
-            "coréen": {
-                "title": "재무 관리자",
-                "balance_label": "총 잔액:",
-                "alert_label": "경고: 당신은 마이너스입니다!",
-                "deposit_button": "입금",
-                "withdraw_button": "출금",
-                "transfer_button": "이체",
-                "search_button": "검색",
-                "export_button": "CSV로 내보내기",
-                "check_alerts_button": "알림 확인",
-                "date_label": "날짜 (YYYY-MM-DD):",
-                "category_label": "카테고리:",
-                "type_label": "유형:",
-                "start_date_label": "시작 날짜 (YYYY-MM-DD):",
-                "end_date_label": "종료 날짜 (YYYY-MM-DD):",
-                "min_amount_label": "최소 금액:",
-                "max_amount_label": "최대 금액:",
-                "sort_label": "금액별 정렬:",
-                "reference_placeholder": "참조",
-                "description_placeholder": "설명",
-                "amount_placeholder": "금액",
-                "category_placeholder": "카테고리",
-                "logout_button": "로그아웃",
-                "account_label": "은행 계좌:"
+            "russian": {
+                "title": "Financial Manager",
+                "balance_label": "Total Balance:",
+                "alert_label": "Warning: You are overdrawn!",
+                "deposit_button": "Deposit",
+                "withdraw_button": "Withdraw",
+                "transfer_button": "Transfer",
+                "search_button": "Search",
+                "export_button": "Export to CSV",
+                "check_alerts_button": "Check Alerts",
+                "date_label": "Date (YYYY-MM-DD):",
+                "category_label": "Category:",
+                "type_label": "Type:",
+                "start_date_label": "Start Date (YYYY-MM-DD):",
+                "end_date_label": "End Date (YYYY-MM-DD):",
+                "min_amount_label": "Min Amount:",
+                "max_amount_label": "Max Amount:",
+                "sort_label": "Sort by Amount:",
+                "reference_placeholder": "Reference",
+                "description_placeholder": "Description",
+                "amount_placeholder": "Amount",
+                "category_placeholder": "Category",
+                "logout_button": "Logout",
+                "account_label": "Bank Account:"
+            },
+            "korean": {
+                "title": "Finance Manager",
+                "balance_label": "Total Balance:",
+                "alert_label": "Warning: You are overdrawn!",
+                "deposit_button": "Deposit",
+                "withdraw_button": "Withdraw",
+                "transfer_button": "Transfer",
+                "search_button": "Search",
+                "export_button": "Export to CSV",
+                "check_alerts_button": "Check Alerts",
+                "date_label": "Date (YYYY-MM-DD):",
+                "category_label": "Category:",
+                "type_label": "Type:",
+                "start_date_label": "Start Date (YYYY-MM-DD):",
+                "end_date_label": "End Date (YYYY-MM-DD):",
+                "min_amount_label": "Min Amount:",
+                "max_amount_label": "Max Amount:",
+                "sort_label": "Sort by Amount:",
+                "reference_placeholder": "Reference",
+                "description_placeholder": "Description",
+                "amount_placeholder": "Amount",
+                "category_placeholder": "Category",
+                "logout_button": "Logout",
+                "account_label": "Bank Account:"
             }
         }
 
-        self.title("Gestionnaire de Finances")
+        self.title("Finance Manager")
         self.geometry("1000x700")
 
-        # Utiliser un dictionnaire pour stocker les soldes des comptes
         self.accounts = {
-            "Compte Principal": 450,
-            "Compte Épargne": 1600,
-            "Compte Entreprise": 7500,
+            "Main Account": 450,
+            "Savings Account": 1600,
+            "Business Account": 7500,
         }
-        self.user_accounts = {}  # Dictionnaire pour stocker les comptes utilisateurs
-        self.current_account = "Compte Principal"
+        self.user_accounts = {}
+        self.current_account = "Main Account"
         self.create_widgets()
         self.refresh_overview()
 
     def create_widgets(self):
-        # Créez un conteneur pour les boutons de déconnexion et de langue
+        """
+        Creates and configures the user interface widgets.
+        """
         top_frame = ctk.CTkFrame(self)
         top_frame.pack(fill='x', pady=5)
 
-        # Ajoutez le bouton de déconnexion à gauche dans le conteneur
         self.logout_button = ctk.CTkButton(top_frame, text=self.translations[self.language]["logout_button"], command=self.logout)
         self.logout_button.pack(side='left', padx=10)
 
-        # Ajoutez le menu de langue à droite dans le conteneur
-        self.language_menu = ctk.CTkOptionMenu(top_frame, values=["français", "anglais", "russe", "coréen"], command=self.change_language)
+        self.language_menu = ctk.CTkOptionMenu(top_frame, values=["french", "english", "russian", "korean"], command=self.change_language)
         self.language_menu.pack(side='right', padx=10)
         self.language_menu.set(self.language)
 
@@ -149,15 +163,12 @@ class FinanceManagerApp(ctk.CTk):
         self.notebook.pack(pady=20, fill='both', expand=True)
 
         self.transactions_tab = self.notebook.add("Transactions")
-        self.overview_tab = self.notebook.add("Vue d'ensemble")
-        self.export_tab = self.notebook.add("Exportation")
+        self.overview_tab = self.notebook.add("Overview")
+        self.export_tab = self.notebook.add("Export")
         self.notifications_tab = self.notebook.add("Notifications")
 
         custom_font = ctk.CTkFont(family="KalniaGlaze-VariableFont_wdth,wght", size=24)
 
-        # Ajoutez le reste de vos widgets ici...
-
-        # Exemple : Ajout du label de solde
         self.balance_label = ctk.CTkLabel(self.transactions_tab, text="", font=("Helvetica", 18))
         self.balance_label.pack(pady=10)
 
@@ -170,11 +181,9 @@ class FinanceManagerApp(ctk.CTk):
         self.amount_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=self.translations[self.language]["amount_placeholder"])
         self.amount_entry.pack(pady=5)
 
-        # Use CTkComboBox for category selection
         self.category_entry = ctk.CTkComboBox(self.transactions_tab, values=["Bills", "Leisure", "Dining", "Travels", "Other Categories"], text_color="white")
         self.category_entry.pack(pady=5)
 
-        # Container for deposit, withdraw, transfer buttons and account switcher
         self.action_frame = ctk.CTkFrame(self.transactions_tab)
         self.action_frame.pack(pady=5)
 
@@ -187,7 +196,6 @@ class FinanceManagerApp(ctk.CTk):
         self.transfer_button = ctk.CTkButton(self.action_frame, text=self.translations[self.language]["transfer_button"], command=self.transfer)
         self.transfer_button.grid(row=0, column=2, padx=5)
 
-        # Add the account switcher next to the transfer button
         self.account_label = ctk.CTkLabel(self.action_frame, text=self.translations[self.language]["account_label"])
         self.account_label.grid(row=0, column=3, padx=5)
         self.account_menu = ctk.CTkOptionMenu(self.action_frame, values=list(self.accounts.keys()), command=self.switch_account)
@@ -197,7 +205,6 @@ class FinanceManagerApp(ctk.CTk):
         self.search_frame = ctk.CTkFrame(self.transactions_tab)
         self.search_frame.pack(pady=10)
 
-        # Dates column with Calendar
         self.date_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["date_label"])
         self.date_label.grid(row=0, column=0, padx=5, pady=5)
         self.date_entry = DateEntry(self.search_frame, width=12, background='lightblue', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd')
@@ -213,7 +220,6 @@ class FinanceManagerApp(ctk.CTk):
         self.end_date_entry = DateEntry(self.search_frame, width=12, background='lightblue', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.end_date_entry.grid(row=2, column=1, padx=5, pady=5)
 
-        # Amounts column
         self.min_amount_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["min_amount_label"])
         self.min_amount_label.grid(row=0, column=2, padx=5, pady=5)
         self.min_amount_entry = ctk.CTkEntry(self.search_frame)
@@ -224,7 +230,6 @@ class FinanceManagerApp(ctk.CTk):
         self.max_amount_entry = ctk.CTkEntry(self.search_frame)
         self.max_amount_entry.grid(row=1, column=3, padx=5, pady=5)
 
-        # Other fields
         self.category_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["category_label"])
         self.category_label.grid(row=2, column=2, padx=5, pady=5)
         self.category_search_entry = ctk.CTkComboBox(self.search_frame, values=["Bills", "Leisure", "Dining", "Travels", "Other Categories"], text_color="white")
@@ -264,13 +269,28 @@ class FinanceManagerApp(ctk.CTk):
         self.theme_menu.set("dark")
 
     def change_theme(self, theme):
+        """
+        Changes the theme of the application.
+
+        Args:
+            theme (str): The theme to apply ("dark" or "light").
+        """
         ctk.set_appearance_mode(theme)
 
     def change_language(self, new_language):
+        """
+        Changes the language of the user interface.
+
+        Args:
+            new_language (str): The new language to apply.
+        """
         self.language = new_language
         self.update_translations()
 
     def update_translations(self):
+        """
+        Updates the translations of the user interface based on the current language.
+        """
         translations = self.translations[self.language]
         self.title(translations["title"])
         self.balance_label.configure(text=translations["balance_label"])
@@ -296,81 +316,130 @@ class FinanceManagerApp(ctk.CTk):
         self.account_label.configure(text=translations["account_label"])
 
     def switch_account(self, new_account):
+        """
+        Switches the currently selected account.
+
+        Args:
+            new_account (str): The new account to select.
+        """
         self.current_account = new_account
         print(f"Switched to account: {self.current_account}")
-        # Ajoutez ici la logique pour mettre à jour l'affichage en fonction du compte sélectionné
         self.refresh_overview()
 
     def deposit(self):
+        """
+        Adds an amount to the current account balance.
+        """
         amount = float(self.amount_entry.get())
         self.accounts[self.current_account] += amount
         self.refresh_overview()
 
     def withdraw(self):
+        """
+        Subtracts an amount from the current account balance.
+        """
         amount = float(self.amount_entry.get())
         self.accounts[self.current_account] -= amount
         self.refresh_overview()
 
     def transfer(self):
+        """
+        Transfers an amount between accounts (to be implemented).
+        """
         pass
 
     def search_transactions(self):
+        """
+        Searches for transactions based on specified criteria (to be implemented).
+        """
         pass
 
     def refresh_transactions(self, filter_criteria=None):
+        """
+        Refreshes the list of transactions (to be implemented).
+
+        Args:
+            filter_criteria (dict, optional): Filtering criteria for transactions.
+        """
         pass
 
     def refresh_overview(self):
+        """
+        Refreshes the display of the current account balance.
+        """
         self.balance_label.configure(text=f"{self.translations[self.language]['balance_label']} {self.accounts[self.current_account]:.2f} €")
 
     def export_to_csv(self):
-        transactions = []  # La liste des transactions sera remplie par votre collègue
-        df = pd.DataFrame(transactions, columns=['ID', 'Référence', 'Description', 'Montant', 'Date', 'Type', 'Catégorie', 'Expéditeur', 'Bénéficiare'])
+        """
+        Exports transactions to a CSV file.
+        """
+        transactions = []
+        df = pd.DataFrame(transactions, columns=['ID', 'Reference', 'Description', 'Amount', 'Date', 'Type', 'Category', 'Sender', 'Receiver'])
         df.to_csv('transactions.csv', index=False)
-        print("Données exportées vers transactions.csv")
+        print("Data exported to transactions.csv")
 
     def check_and_notify_alerts(self):
+        """
+        Checks and notifies alerts (to be implemented).
+        """
         pass
 
     def show_logout_popup(self):
+        """
+        Displays a logout confirmation popup.
+        """
         popup = ctk.CTkToplevel(self)
         popup.title("Confirmation")
         popup.geometry("300x200")
 
-        # Rendre la fenêtre modale
         popup.grab_set()
 
-        message_label = ctk.CTkLabel(popup, text="Vous partez ?", font=("Helvetica", 16, "bold"))
+        message_label = ctk.CTkLabel(popup, text="Are you leaving?", font=("Helvetica", 16, "bold"))
         message_label.pack(pady=10)
 
-        sub_message_label = ctk.CTkLabel(popup, text="Bonne journée et à bientôt", font=("Helvetica", 12))
+        sub_message_label = ctk.CTkLabel(popup, text="Have a nice day and see you soon", font=("Helvetica", 12))
         sub_message_label.pack(pady=5)
 
-        logout_button = ctk.CTkButton(popup, text="Se déconnecter", command=self.confirm_logout)
+        logout_button = ctk.CTkButton(popup, text="Logout", command=self.confirm_logout)
         logout_button.pack(pady=10)
 
-        stay_button = ctk.CTkButton(popup, text="Rester sur l'application", command=popup.destroy)
+        stay_button = ctk.CTkButton(popup, text="Stay on the application", command=popup.destroy)
         stay_button.pack(pady=5)
 
     def confirm_logout(self):
-        self.destroy()  # Ferme la fenêtre actuelle
-        # Vous pouvez ajouter ici le code pour ouvrir une nouvelle fenêtre de connexion si nécessaire
+        """
+        Confirms logout and closes the application.
+        """
+        self.destroy()
 
     def logout(self):
+        """
+        Displays the logout confirmation popup.
+        """
         self.show_logout_popup()
 
     def generate_unique_account_number(self):
-        """Génère un numéro de compte unique."""
+        """
+        Generates a unique account number.
+
+        Returns:
+            str: Unique account number.
+        """
         while True:
             account_number = ''.join(secrets.choice(string.digits) for _ in range(10))
             if account_number not in self.user_accounts:
                 return account_number
 
     def create_new_account(self, user_data):
-        """Crée un nouveau compte pour l'utilisateur avec un numéro de compte aléatoire."""
+        """
+        Creates a new account for the user with a random account number.
+
+        Args:
+            user_data (dict): User data for the new account.
+        """
         new_account_number = self.generate_unique_account_number()
         self.user_accounts[new_account_number] = user_data
-        print(f"Nouveau compte créé avec le numéro : {new_account_number}")
+        print(f"New account created with number: {new_account_number}")
 
 if __name__ == "__main__":
     app = FinanceManagerApp()
