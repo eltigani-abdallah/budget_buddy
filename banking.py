@@ -5,6 +5,18 @@ import pandas as pd
 from tkcalendar import Calendar, DateEntry
 import secrets
 import string
+import json
+
+
+def load_lang(langs):
+    with open (langs,"r", encoding="utf-8") as file:
+        return json.load(file)
+    
+lang_dict=load_lang("./assets/lang.json")
+
+def translate(lang, key):
+    return lang_dict.get(lang,{}).get(key,f"[{key} not found]")
+
 
 class FinanceManagerApp(ctk.CTk):
     """
@@ -29,108 +41,7 @@ class FinanceManagerApp(ctk.CTk):
         ctk.set_default_color_theme("dark-blue")
 
         self.language = "french"
-        self.translations = {
-            "french": {
-                "title": "Finance Manager",
-                "balance_label": "Total Balance:",
-                "alert_label": "Warning: You are overdrawn!",
-                "deposit_button": "Deposit",
-                "withdraw_button": "Withdraw",
-                "transfer_button": "Transfer",
-                "search_button": "Search",
-                "export_button": "Export to CSV",
-                "check_alerts_button": "Check Alerts",
-                "date_label": "Date (YYYY-MM-DD):",
-                "category_label": "Category:",
-                "type_label": "Type:",
-                "start_date_label": "Start Date (YYYY-MM-DD):",
-                "end_date_label": "End Date (YYYY-MM-DD):",
-                "min_amount_label": "Min Amount:",
-                "max_amount_label": "Max Amount:",
-                "sort_label": "Sort by Amount:",
-                "reference_placeholder": "Reference",
-                "description_placeholder": "Description",
-                "amount_placeholder": "Amount",
-                "category_placeholder": "Category",
-                "logout_button": "Logout",
-                "account_label": "Bank Account:"
-            },
-            "english": {
-                "title": "Finance Manager",
-                "balance_label": "Total Balance:",
-                "alert_label": "Warning: You are overdrawn!",
-                "deposit_button": "Deposit",
-                "withdraw_button": "Withdraw",
-                "transfer_button": "Transfer",
-                "search_button": "Search",
-                "export_button": "Export to CSV",
-                "check_alerts_button": "Check Alerts",
-                "date_label": "Date (YYYY-MM-DD):",
-                "category_label": "Category:",
-                "type_label": "Type:",
-                "start_date_label": "Start Date (YYYY-MM-DD):",
-                "end_date_label": "End Date (YYYY-MM-DD):",
-                "min_amount_label": "Min Amount:",
-                "max_amount_label": "Max Amount:",
-                "sort_label": "Sort by Amount:",
-                "reference_placeholder": "Reference",
-                "description_placeholder": "Description",
-                "amount_placeholder": "Amount",
-                "category_placeholder": "Category",
-                "logout_button": "Logout",
-                "account_label": "Bank Account:"
-            },
-            "russian": {
-                "title": "Financial Manager",
-                "balance_label": "Total Balance:",
-                "alert_label": "Warning: You are overdrawn!",
-                "deposit_button": "Deposit",
-                "withdraw_button": "Withdraw",
-                "transfer_button": "Transfer",
-                "search_button": "Search",
-                "export_button": "Export to CSV",
-                "check_alerts_button": "Check Alerts",
-                "date_label": "Date (YYYY-MM-DD):",
-                "category_label": "Category:",
-                "type_label": "Type:",
-                "start_date_label": "Start Date (YYYY-MM-DD):",
-                "end_date_label": "End Date (YYYY-MM-DD):",
-                "min_amount_label": "Min Amount:",
-                "max_amount_label": "Max Amount:",
-                "sort_label": "Sort by Amount:",
-                "reference_placeholder": "Reference",
-                "description_placeholder": "Description",
-                "amount_placeholder": "Amount",
-                "category_placeholder": "Category",
-                "logout_button": "Logout",
-                "account_label": "Bank Account:"
-            },
-            "korean": {
-                "title": "Finance Manager",
-                "balance_label": "Total Balance:",
-                "alert_label": "Warning: You are overdrawn!",
-                "deposit_button": "Deposit",
-                "withdraw_button": "Withdraw",
-                "transfer_button": "Transfer",
-                "search_button": "Search",
-                "export_button": "Export to CSV",
-                "check_alerts_button": "Check Alerts",
-                "date_label": "Date (YYYY-MM-DD):",
-                "category_label": "Category:",
-                "type_label": "Type:",
-                "start_date_label": "Start Date (YYYY-MM-DD):",
-                "end_date_label": "End Date (YYYY-MM-DD):",
-                "min_amount_label": "Min Amount:",
-                "max_amount_label": "Max Amount:",
-                "sort_label": "Sort by Amount:",
-                "reference_placeholder": "Reference",
-                "description_placeholder": "Description",
-                "amount_placeholder": "Amount",
-                "category_placeholder": "Category",
-                "logout_button": "Logout",
-                "account_label": "Bank Account:"
-            }
-        }
+        
 
         self.title("Finance Manager")
         self.geometry("1000x700")
@@ -152,7 +63,7 @@ class FinanceManagerApp(ctk.CTk):
         top_frame = ctk.CTkFrame(self)
         top_frame.pack(fill='x', pady=5)
 
-        self.logout_button = ctk.CTkButton(top_frame, text=self.translations[self.language]["logout_button"], command=self.logout)
+        self.logout_button = ctk.CTkButton(top_frame, text=translate(self.language,"logout_button"), command=self.logout)
         self.logout_button.pack(side='left', padx=10)
 
         self.language_menu = ctk.CTkOptionMenu(top_frame, values=["french", "english", "russian", "korean"], command=self.change_language)
@@ -172,13 +83,13 @@ class FinanceManagerApp(ctk.CTk):
         self.balance_label = ctk.CTkLabel(self.transactions_tab, text="", font=("Helvetica", 18))
         self.balance_label.pack(pady=10)
 
-        self.reference_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=self.translations[self.language]["reference_placeholder"])
+        self.reference_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=translate(self.language,"reference_placeholder"))
         self.reference_entry.pack(pady=5)
 
-        self.description_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=self.translations[self.language]["description_placeholder"])
+        self.description_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=translate(self.language,"description_placeholder"))
         self.description_entry.pack(pady=5)
 
-        self.amount_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=self.translations[self.language]["amount_placeholder"])
+        self.amount_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=translate(self.language,"amount_placeholder"))
         self.amount_entry.pack(pady=5)
 
         self.category_entry = ctk.CTkComboBox(self.transactions_tab, values=["Bills", "Leisure", "Dining", "Travels", "Other Categories"], text_color="white")
@@ -187,16 +98,16 @@ class FinanceManagerApp(ctk.CTk):
         self.action_frame = ctk.CTkFrame(self.transactions_tab)
         self.action_frame.pack(pady=5)
 
-        self.deposit_button = ctk.CTkButton(self.action_frame, text=self.translations[self.language]["deposit_button"], command=self.deposit)
+        self.deposit_button = ctk.CTkButton(self.action_frame, text=translate(self.language,"deposit_button"), command=self.deposit)
         self.deposit_button.grid(row=0, column=0, padx=5)
 
-        self.withdraw_button = ctk.CTkButton(self.action_frame, text=self.translations[self.language]["withdraw_button"], command=self.withdraw)
+        self.withdraw_button = ctk.CTkButton(self.action_frame, text=translate(self.language,"withdraw_button"), command=self.withdraw)
         self.withdraw_button.grid(row=0, column=1, padx=5)
 
-        self.transfer_button = ctk.CTkButton(self.action_frame, text=self.translations[self.language]["transfer_button"], command=self.transfer)
+        self.transfer_button = ctk.CTkButton(self.action_frame, text=translate(self.language,"transfer_button"), command=self.transfer)
         self.transfer_button.grid(row=0, column=2, padx=5)
 
-        self.account_label = ctk.CTkLabel(self.action_frame, text=self.translations[self.language]["account_label"])
+        self.account_label = ctk.CTkLabel(self.action_frame, text=translate(self.language,"account_label"))
         self.account_label.grid(row=0, column=3, padx=5)
         self.account_menu = ctk.CTkOptionMenu(self.action_frame, values=list(self.accounts.keys()), command=self.switch_account)
         self.account_menu.grid(row=0, column=4, padx=5)
@@ -205,47 +116,47 @@ class FinanceManagerApp(ctk.CTk):
         self.search_frame = ctk.CTkFrame(self.transactions_tab)
         self.search_frame.pack(pady=10)
 
-        self.date_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["date_label"])
+        self.date_label = ctk.CTkLabel(self.search_frame, text=translate(self.language,"date_label"))
         self.date_label.grid(row=0, column=0, padx=5, pady=5)
         self.date_entry = DateEntry(self.search_frame, width=12, background='lightblue', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.date_entry.grid(row=0, column=1, padx=5, pady=5)
 
-        self.start_date_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["start_date_label"])
+        self.start_date_label = ctk.CTkLabel(self.search_frame, text=translate(self.language,"start_date_label"))
         self.start_date_label.grid(row=1, column=0, padx=5, pady=5)
         self.start_date_entry = DateEntry(self.search_frame, width=12, background='lightblue', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.start_date_entry.grid(row=1, column=1, padx=5, pady=5)
 
-        self.end_date_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["end_date_label"])
+        self.end_date_label = ctk.CTkLabel(self.search_frame, text=translate(self.language,"end_date_label"))
         self.end_date_label.grid(row=2, column=0, padx=5, pady=5)
         self.end_date_entry = DateEntry(self.search_frame, width=12, background='lightblue', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.end_date_entry.grid(row=2, column=1, padx=5, pady=5)
 
-        self.min_amount_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["min_amount_label"])
+        self.min_amount_label = ctk.CTkLabel(self.search_frame, text=translate(self.language,"min_amount_label"))
         self.min_amount_label.grid(row=0, column=2, padx=5, pady=5)
         self.min_amount_entry = ctk.CTkEntry(self.search_frame)
         self.min_amount_entry.grid(row=0, column=3, padx=5, pady=5)
 
-        self.max_amount_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["max_amount_label"])
+        self.max_amount_label = ctk.CTkLabel(self.search_frame, text=translate(self.language,"max_amount_label"))
         self.max_amount_label.grid(row=1, column=2, padx=5, pady=5)
         self.max_amount_entry = ctk.CTkEntry(self.search_frame)
         self.max_amount_entry.grid(row=1, column=3, padx=5, pady=5)
 
-        self.category_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["category_label"])
+        self.category_label = ctk.CTkLabel(self.search_frame, text=translate(self.language,"category_label"))
         self.category_label.grid(row=2, column=2, padx=5, pady=5)
         self.category_search_entry = ctk.CTkComboBox(self.search_frame, values=["Bills", "Leisure", "Dining", "Travels", "Other Categories"], text_color="white")
         self.category_search_entry.grid(row=2, column=3, padx=5, pady=5)
 
-        self.type_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["type_label"])
+        self.type_label = ctk.CTkLabel(self.search_frame, text=translate(self.language,"type_label"))
         self.type_label.grid(row=3, column=0, padx=5, pady=5)
         self.type_entry = ctk.CTkComboBox(self.search_frame, values=["Withdrawal", "Transfer", "Deposit"], text_color="white")
         self.type_entry.grid(row=3, column=1, padx=5, pady=5)
 
-        self.sort_label = ctk.CTkLabel(self.search_frame, text=self.translations[self.language]["sort_label"])
+        self.sort_label = ctk.CTkLabel(self.search_frame, text=translate(self.language,"sort_label"))
         self.sort_label.grid(row=3, column=2, padx=5, pady=5)
         self.sort_entry = ctk.CTkComboBox(self.search_frame, values=["", "ASC", "DESC"], text_color="white")
         self.sort_entry.grid(row=3, column=3, padx=5, pady=5)
 
-        self.search_button = ctk.CTkButton(self.transactions_tab, text=self.translations[self.language]["search_button"], command=self.search_transactions)
+        self.search_button = ctk.CTkButton(self.transactions_tab, text=translate(self.language,"search_button"), command=self.search_transactions)
         self.search_button.pack(pady=5)
 
         self.transactions_listbox = ctk.CTkTextbox(self.transactions_tab, width=760, height=200)
@@ -258,10 +169,10 @@ class FinanceManagerApp(ctk.CTk):
         self.canvas = FigureCanvasTkAgg(self.figure, self.overview_tab)
         self.canvas.get_tk_widget().pack(fill='both', expand=True)
 
-        self.export_button = ctk.CTkButton(self.export_tab, text=self.translations[self.language]["export_button"], command=self.export_to_csv)
+        self.export_button = ctk.CTkButton(self.export_tab, text=translate(self.language,"export_button"), command=self.export_to_csv)
         self.export_button.pack(pady=20)
 
-        self.check_alerts_button = ctk.CTkButton(self.notifications_tab, text=self.translations[self.language]["check_alerts_button"], command=self.check_and_notify_alerts)
+        self.check_alerts_button = ctk.CTkButton(self.notifications_tab, text=translate(self.language,"check_alerts_button"), command=self.check_and_notify_alerts)
         self.check_alerts_button.pack(pady=20)
 
         self.theme_menu = ctk.CTkOptionMenu(self, values=["dark", "light"], command=self.change_theme)
@@ -291,7 +202,7 @@ class FinanceManagerApp(ctk.CTk):
         """
         Updates the translations of the user interface based on the current language.
         """
-        translations = self.translations[self.language]
+        translations = lang_dict[self.language]
         self.title(translations["title"])
         self.balance_label.configure(text=translations["balance_label"])
         self.alert_label.configure(text=translations.get("alert_label", ""))
@@ -367,7 +278,7 @@ class FinanceManagerApp(ctk.CTk):
         """
         Refreshes the display of the current account balance.
         """
-        self.balance_label.configure(text=f"{self.translations[self.language]['balance_label']} {self.accounts[self.current_account]:.2f} €")
+        self.balance_label.configure(text=f"{translate(self.language,'balance_label')} {self.accounts[self.current_account]:.2f} €")
 
     def export_to_csv(self):
         """
