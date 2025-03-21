@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def on_close():
+    logout()
     print("shutting down...")
     app.quit()
     exit()
