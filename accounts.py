@@ -23,7 +23,7 @@ def validate_password(password):
         return False
     if not re.search(r'[0-9]', password):
         return False
-    if not re.search(r'[@$!%*?_&]', password):  # Include underscore in the special characters
+    if not re.search(r'[@$!%*?_&]', password): 
         return False
     return True
 
