@@ -1,5 +1,5 @@
 {
-    "anglais": 
+    "english": 
     {
     "title": "Finance Manager",
     "balance_label": "Total Balance:",
@@ -21,9 +21,11 @@
     "reference_placeholder": "Reference",
     "description_placeholder": "Description",
     "amount_placeholder": "Amount",
-    "category_placeholder": "Category"
+    "category_placeholder": "Category",
+    "logout_button": "Logout",
+    "account_label": "Bank Account:"
     },
-    "français" :
+    "french" :
     {
     "title": "Gestionnaire de Finances",
     "balance_label": "Solde total :",
@@ -45,9 +47,11 @@
     "reference_placeholder": "Référence",
     "description_placeholder": "Description",
     "amount_placeholder": "Montant",
-    "category_placeholder": "Catégorie"
+    "category_placeholder": "Catégorie",
+    "logout_button": "Déconnexion",
+    "account_label": "Compte bancaire:"
     },
-    "russe":
+    "russian":
     {
         
     "title": "Финансовый Менеджер",
@@ -70,9 +74,11 @@
     "reference_placeholder": "Ссылка",
     "description_placeholder": "Описание",
     "amount_placeholder": "Сумма",
-    "category_placeholder": "Категория"
+    "category_placeholder": "Категория",
+    "logout_button": "выйти из системы",
+    "account_label": "банковский счет:"
     },
-    "coréen":
+    "korean":
     
     {"title": "재무 관리자",
     "balance_label": "총 잔액:",
@@ -94,6 +100,8 @@
     "reference_placeholder": "참조",
     "description_placeholder": "설명",
     "amount_placeholder": "금액",
-    "category_placeholder": "카테고리"
+    "category_placeholder": "카테고리",
+    "logout_button": "로그아웃",
+    "account_label": "은행 계좌:" 
     }
 }
