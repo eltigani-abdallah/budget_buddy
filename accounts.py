@@ -6,10 +6,7 @@ import re
 import os
 import subprocess
 from dotenv import load_dotenv
-<<<<<<< HEAD
 import json
-=======
->>>>>>> d6c8600469335efa84f62600caa1d96f325636ed
 
 load_dotenv()
 
@@ -27,11 +24,7 @@ def validate_password(password):
         return False
     if not re.search(r'[0-9]', password):
         return False
-<<<<<<< HEAD
     if not re.search(r'[@$!%*?_&-]', password):  # Include underscore in the special characters
-=======
-    if not re.search(r'[@$!%*?_&]', password): 
->>>>>>> d6c8600469335efa84f62600caa1d96f325636ed
         return False
     return True
 
@@ -105,16 +98,12 @@ def on_login():
     if verify_login(email, password):
         messagebox.showinfo("Success", "Login successful!")
         app.destroy()
-<<<<<<< HEAD
         backend_path = "banking.py"
 
         session_data= {"email": email}
         with open("./assets/session.json", "w") as session_file:
             json.dump(session_data, session_file)
 
-=======
-        backend_path = "login.py"
->>>>>>> d6c8600469335efa84f62600caa1d96f325636ed
         try:
             subprocess.run(["python", backend_path])
         except Exception:
