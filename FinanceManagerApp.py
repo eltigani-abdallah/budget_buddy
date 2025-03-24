@@ -19,6 +19,7 @@ class FinanceManagerApp(ctk.CTkFrame):
         super().__init__(master)
         self.master=master
         
+        
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 

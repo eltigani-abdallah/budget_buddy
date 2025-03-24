@@ -8,6 +8,7 @@ import string
 import os
 import json
 from datetime import datetime
+from collections import defaultdict
 
 def on_close():
     logout()
@@ -32,21 +33,21 @@ def translate(lang, key):
 
 class FinanceManagerApp(ctk.CTk):
     """
-    Financial management application using CustomTkinter for the user interface.
+    Application de gestion financière utilisant CustomTkinter pour l'interface utilisateur.
 
-    Attributes:
-        language (str): Current language of the user interface.
-        translations (dict): Dictionary containing translations for each supported language.
-        accounts (dict): Dictionary containing account balances.
-        user_accounts (dict): Dictionary to store user accounts.
-        current_account (str): Currently selected account.
-        beneficiaries (dict): Dictionary to store beneficiary information.
+    Attributs:
+        language (str): Langue actuelle de l'interface utilisateur.
+        translations (dict): Dictionnaire contenant les traductions pour chaque langue supportée.
+        accounts (dict): Dictionnaire contenant les soldes des comptes.
+        user_accounts (dict): Dictionnaire pour stocker les comptes utilisateurs.
+        current_account (str): Compte actuellement sélectionné.
+        beneficiaries (dict): Dictionnaire pour stocker les informations des bénéficiaires.
     """
 
     def __init__(self):
         """
-        Initializes the FinanceManagerApp application.
-        Configures the user interface, accounts, and translations.
+        Initialise l'application FinanceManagerApp.
+        Configure l'interface utilisateur, les comptes et les traductions.
         """
         super().__init__()
 
@@ -67,12 +68,13 @@ class FinanceManagerApp(ctk.CTk):
         self.current_account = "Main Account"
         self.transactions = []
         self.beneficiaries = {}
+        self.current_user_email = "user1@example.com"  # Définir sur l'email de l'utilisateur connecté
         self.create_widgets()
         self.refresh_overview()
 
     def create_widgets(self):
         """
-        Creates and configures the user interface widgets.
+        Crée et configure les widgets de l'interface utilisateur.
         """
         top_frame = ctk.CTkFrame(self)
         top_frame.pack(fill='x', pady=5)
@@ -108,7 +110,7 @@ class FinanceManagerApp(ctk.CTk):
         self.amount_entry = ctk.CTkEntry(self.transactions_tab, placeholder_text=translate(self.language, "amount_placeholder"))
         self.amount_entry.pack(pady=5)
 
-        self.category_entry = ctk.CTkComboBox(self.transactions_tab, values=["Bills", "Leisure", "Dining", "Travels", "Other Categories"], text_color="white")
+        self.category_entry = ctk.CTkComboBox(self.transactions_tab, values=["", "Bills", "Leisure", "Dining", "Travels", "Other Categories"], text_color="white")
         self.category_entry.pack(pady=5)
 
         self.action_frame = ctk.CTkFrame(self.transactions_tab)
@@ -164,12 +166,12 @@ class FinanceManagerApp(ctk.CTk):
 
         self.category_label = ctk.CTkLabel(self.search_frame, text=translate(self.language, "category_label"))
         self.category_label.grid(row=2, column=2, padx=5, pady=5)
-        self.category_search_entry = ctk.CTkComboBox(self.search_frame, values=["Bills", "Leisure", "Dining", "Travels", "Other Categories"], text_color="white")
+        self.category_search_entry = ctk.CTkComboBox(self.search_frame, values=["", "Bills", "Leisure", "Dining", "Travels", "Other Categories"], text_color="white")
         self.category_search_entry.grid(row=2, column=3, padx=5, pady=5)
 
         self.type_label = ctk.CTkLabel(self.search_frame, text=translate(self.language, "type_label"))
         self.type_label.grid(row=3, column=0, padx=5, pady=5)
-        self.type_entry = ctk.CTkComboBox(self.search_frame, values=["Withdrawal", "Transfer", "Deposit"], text_color="white")
+        self.type_entry = ctk.CTkComboBox(self.search_frame, values=["", "Withdrawal", "Transfer", "Deposit"], text_color="white")
         self.type_entry.grid(row=3, column=1, padx=5, pady=5)
 
         self.sort_label = ctk.CTkLabel(self.search_frame, text=translate(self.language, "sort_label"))
@@ -186,9 +188,13 @@ class FinanceManagerApp(ctk.CTk):
         self.alert_label = ctk.CTkLabel(self.overview_tab, text="", text_color="red")
         self.alert_label.pack(pady=10)
 
-        self.figure, self.ax = plt.subplots()
-        self.canvas = FigureCanvasTkAgg(self.figure, self.overview_tab)
-        self.canvas.get_tk_widget().pack(fill='both', expand=True)
+        # Bouton pour afficher le diagramme en secteurs
+        self.show_chart_button = ctk.CTkButton(self.overview_tab, text="Show Pie Chart", command=self.show_pie_chart)
+        self.show_chart_button.pack(pady=10)
+
+        # Cadre pour contenir le graphique
+        self.chart_frame = ctk.CTkFrame(self.overview_tab, width=600, height=600)
+        self.chart_frame.pack(pady=10)
 
         self.export_button = ctk.CTkButton(self.export_tab, text=translate(self.language, "export_button"), command=self.export_to_csv)
         self.export_button.pack(pady=20)
@@ -218,28 +224,64 @@ class FinanceManagerApp(ctk.CTk):
         self.theme_menu.pack(pady=10)
         self.theme_menu.set("dark")
 
+    def show_pie_chart(self):
+        """
+        Affiche un diagramme en secteurs des catégories de transactions basé sur les dépenses de l'utilisateur.
+        """
+        # Filtrer les transactions par l'email de l'utilisateur actuel
+        user_transactions = [t for t in self.transactions if t['user_email'] == self.current_user_email]
+
+        # Calculer les totaux par catégorie
+        category_totals = defaultdict(float)
+        for transaction in user_transactions:
+            if transaction['type'] in ['Withdrawal', 'Transfer', 'Deposit']:  # Ne considérer que les dépenses
+                category_totals[transaction['category']] += float(transaction['amount'])
+
+        # Créer le diagramme en secteurs
+        categories = list(category_totals.keys())
+        amounts = list(category_totals.values())
+        if not amounts:
+            print("Aucune transaction disponible à afficher pour l'utilisateur actuel.")
+            return
+
+        max_value = max(amounts)
+        max_index = amounts.index(max_value)
+        explode = [0.1 if i == max_index else 0 for i in range(len(amounts))]
+
+        fig, ax = plt.subplots(figsize=(8, 8))  # Augmenter la taille de la figure
+        ax.pie(amounts, labels=categories, explode=explode, shadow=True, autopct="%1.1f%%")
+
+        # Effacer le contenu précédent du cadre
+        for widget in self.chart_frame.winfo_children():
+            widget.destroy()
+
+        # Intégrer le graphique dans l'interface
+        canvas = FigureCanvasTkAgg(fig, master=self.chart_frame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill='both', expand=True)
+
     def change_theme(self, theme):
         """
-        Changes the theme of the application.
+        Change le thème de l'application.
 
         Args:
-            theme (str): The theme to apply ("dark" or "light").
+            theme (str): Le thème à appliquer ("dark" ou "light").
         """
         ctk.set_appearance_mode(theme)
 
     def change_language(self, new_language):
         """
-        Changes the language of the user interface.
+        Change la langue de l'interface utilisateur.
 
         Args:
-            new_language (str): The new language to apply.
+            new_language (str): La nouvelle langue à appliquer.
         """
         self.language = new_language
         self.update_translations()
 
     def update_translations(self):
         """
-        Updates the translations of the user interface based on the current language.
+        Met à jour les traductions de l'interface utilisateur en fonction de la langue actuelle.
         """
         translations = lang_dict[self.language]
         self.title(translations["title"])
@@ -271,28 +313,28 @@ class FinanceManagerApp(ctk.CTk):
 
     def switch_account(self, new_account):
         """
-        Switches the currently selected account.
+        Change le compte actuellement sélectionné.
 
         Args:
-            new_account (str): The new account to select.
+            new_account (str): Le nouveau compte à sélectionner.
         """
         self.current_account = new_account
-        print(f"Switched to account {self.current_account}")
+        print(f"Changement vers le compte {self.current_account}")
         self.refresh_overview()
 
     def select_beneficiary(self, beneficiary_email):
         """
-        Selects a beneficiary for the transfer.
+        Sélectionne un bénéficiaire pour le transfert.
 
         Args:
-            beneficiary_email (str): The email of the beneficiary to select.
+            beneficiary_email (str): L'email du bénéficiaire à sélectionner.
         """
         self.selected_beneficiary = beneficiary_email
-        print(f"Selected beneficiary {self.selected_beneficiary}")
+        print(f"Bénéficiaire sélectionné {self.selected_beneficiary}")
 
     def deposit(self):
         """
-        Adds an amount to the current account balance.
+        Ajoute un montant au solde du compte actuel.
         """
         amount = float(self.amount_entry.get())
         self.accounts[self.current_account] += amount
@@ -304,14 +346,14 @@ class FinanceManagerApp(ctk.CTk):
             "category": self.category_entry.get(),
             "from_account": self.current_account,
             "to_account": self.current_account,
-            "user_email": self.beneficiary_entry.get()  # Ajoute l'email de l'utilisateur
+            "user_email": self.current_user_email  # Utiliser l'email de l'utilisateur actuel
         })
         self.refresh_overview()
-        self.display_history()  # Met à jour l'historique après un dépôt
+        self.display_history()  # Mettre à jour l'historique après un dépôt
 
     def withdraw(self):
         """
-        Subtracts an amount from the current account balance.
+        Soustrait un montant du solde du compte actuel.
         """
         amount = float(self.amount_entry.get())
         self.accounts[self.current_account] -= amount
@@ -323,14 +365,14 @@ class FinanceManagerApp(ctk.CTk):
             "category": self.category_entry.get(),
             "from_account": self.current_account,
             "to_account": self.current_account,
-            "user_email": self.beneficiary_entry.get()  # Ajoute l'email de l'utilisateur
+            "user_email": self.current_user_email  # Utiliser l'email de l'utilisateur actuel
         })
         self.refresh_overview()
-        self.display_history()  # Met à jour l'historique après un retrait
+        self.display_history()  # Mettre à jour l'historique après un retrait
 
     def transfer(self):
         """
-        Transfers an amount between accounts or to a beneficiary.
+        Transfère un montant entre des comptes ou vers un bénéficiaire.
         """
         amount = float(self.amount_entry.get())
         target_account = self.account_entry.get()
@@ -345,7 +387,7 @@ class FinanceManagerApp(ctk.CTk):
                 "category": self.category_entry.get(),
                 "from_account": self.current_account,
                 "to_account": target_account,
-                "user_email": self.beneficiary_entry.get()  # Ajoute l'email de l'utilisateur
+                "user_email": self.current_user_email  # Utiliser l'email de l'utilisateur actuel
             })
         elif self.beneficiary_entry.get():
             self.accounts[self.current_account] -= amount
@@ -357,24 +399,24 @@ class FinanceManagerApp(ctk.CTk):
                 "category": self.category_entry.get(),
                 "from_account": self.current_account,
                 "to_beneficiary": self.beneficiary_entry.get(),
-                "user_email": self.beneficiary_entry.get()  # Ajoute l'email de l'utilisateur
+                "user_email": self.current_user_email  # Utiliser l'email de l'utilisateur actuel
             })
         self.refresh_overview()
-        self.display_history()  # Met à jour l'historique après un transfert
+        self.display_history()  # Mettre à jour l'historique après un transfert
 
     def add_beneficiary(self):
         """
-        Adds a new beneficiary using their email address.
+        Ajoute un nouveau bénéficiaire en utilisant son adresse email.
         """
         email = self.beneficiary_email_entry.get()
         if email not in self.beneficiaries:
             self.beneficiaries[email] = {"name": "Unknown", "email": email}
-            self.beneficiary_listbox.insert(ctk.END, f"Added beneficiary {email}\n")
-            print(f"Beneficiary added {email}")
+            self.beneficiary_listbox.insert(ctk.END, f"Bénéficiaire ajouté {email}\n")
+            print(f"Bénéficiaire ajouté {email}")
 
     def search_transactions(self):
         """
-        Searches for transactions based on specified criteria.
+        Recherche des transactions en fonction des critères spécifiés.
         """
         date = self.date_entry.get()
         start_date = self.start_date_entry.get()
@@ -408,10 +450,10 @@ class FinanceManagerApp(ctk.CTk):
 
     def display_transactions(self, transactions):
         """
-        Displays the list of transactions in the transactions listbox.
+        Affiche la liste des transactions dans la listbox des transactions.
 
         Args:
-            transactions (list): List of transactions to display.
+            transactions (list): Liste des transactions à afficher.
         """
         self.transactions_listbox.delete("1.0", ctk.END)
         for transaction in transactions:
@@ -422,34 +464,35 @@ class FinanceManagerApp(ctk.CTk):
         """
         Affiche l'historique complet des transactions dans la zone de texte.
         """
-        self.history_listbox.delete("1.0", ctk.END)  # Efface le contenu actuel
+        self.history_listbox.delete("1.0", ctk.END)  # Effacer le contenu actuel
         for transaction in self.transactions:
-            account_info = f"From: {transaction.get('from_account', 'N/A')} To: {transaction.get('to_account', 'N/A') if 'to_account' in transaction else transaction.get('to_beneficiary', 'N/A')}"
-            self.history_listbox.insert(ctk.END, f"{transaction['date']} - {transaction['description']} - {transaction['amount']} € - {account_info} - {transaction['category']} - {transaction['type']} - {transaction.get('user_email', '')}\n")
+            if transaction['user_email'] == self.current_user_email and transaction['type'] in ['Deposit', 'Withdrawal', 'Transfer']:
+                account_info = f"From: {transaction.get('from_account', 'N/A')} To: {transaction.get('to_account', 'N/A') if 'to_account' in transaction else transaction.get('to_beneficiary', 'N/A')}"
+                self.history_listbox.insert(ctk.END, f"{transaction['date']} - {transaction['description']} - {transaction['amount']} € - {account_info} - {transaction['category']} - {transaction['type']} - {self.current_user_email}\n")
 
     def refresh_overview(self):
         """
-        Refreshes the display of the current account balance.
+        Rafraîchit l'affichage du solde du compte actuel.
         """
         self.balance_label.configure(text=f"{translate(self.language, 'balance_label')} {self.accounts[self.current_account]:.2f} €")
 
     def export_to_csv(self):
         """
-        Exports transactions to a CSV file.
+        Exporte les transactions vers un fichier CSV.
         """
         df = pd.DataFrame(self.transactions, columns=['type', 'amount', 'date', 'description', 'category', 'from_account', 'to_account', 'to_beneficiary', 'user_email'])
         df.to_csv('transactions.csv', index=False)
-        print("Data exported to transactions.csv")
+        print("Données exportées vers transactions.csv")
 
     def check_and_notify_alerts(self):
         """
-        Checks and notifies alerts (to be implemented).
+        Vérifie et notifie les alertes (à implémenter).
         """
         pass
 
     def show_logout_popup(self):
         """
-        Displays a logout confirmation popup.
+        Affiche une popup de confirmation de déconnexion.
         """
         popup = ctk.CTkToplevel(self)
         popup.title("Confirmation")
@@ -457,37 +500,37 @@ class FinanceManagerApp(ctk.CTk):
 
         popup.grab_set()
 
-        message_label = ctk.CTkLabel(popup, text="Are you leaving?", font=("Helvetica", 16, "bold"))
+        message_label = ctk.CTkLabel(popup, text="Vous partez ?", font=("Helvetica", 16, "bold"))
         message_label.pack(pady=10)
 
-        sub_message_label = ctk.CTkLabel(popup, text="Have a nice day and see you soon", font=("Helvetica", 12))
+        sub_message_label = ctk.CTkLabel(popup, text="Passez une bonne journée et à bientôt", font=("Helvetica", 12))
         sub_message_label.pack(pady=5)
 
-        logout_button = ctk.CTkButton(popup, text="Logout", command=self.confirm_logout)
+        logout_button = ctk.CTkButton(popup, text="Déconnexion", command=self.confirm_logout)
         logout_button.pack(pady=10)
 
-        stay_button = ctk.CTkButton(popup, text="Stay on the application", command=popup.destroy)
+        stay_button = ctk.CTkButton(popup, text="Rester sur l'application", command=popup.destroy)
         stay_button.pack(pady=5)
 
     def confirm_logout(self):
         """
-        Confirms logout and closes the application.
+        Confirme la déconnexion et ferme l'application.
         """
         on_close()
         self.destroy()
 
     def logout(self):
         """
-        Displays the logout confirmation popup.
+        Affiche la popup de confirmation de déconnexion.
         """
         self.show_logout_popup()
 
     def generate_unique_account_number(self):
         """
-        Generates a unique account number.
+        Génère un numéro de compte unique.
 
         Returns:
-            str: Unique account number.
+            str: Numéro de compte unique.
         """
         while True:
             account_number = ''.join(secrets.choice(string.digits) for _ in range(10))
@@ -496,14 +539,14 @@ class FinanceManagerApp(ctk.CTk):
 
     def create_new_account(self, user_data):
         """
-        Creates a new account for the user with a random account number.
+        Crée un nouveau compte pour l'utilisateur avec un numéro de compte aléatoire.
 
         Args:
-            user_data (dict): User data for the new account.
+            user_data (dict): Données utilisateur pour le nouveau compte.
         """
         new_account_number = self.generate_unique_account_number()
         self.user_accounts[new_account_number] = user_data
-        print(f"New account created with number {new_account_number}")
+        print(f"Nouveau compte créé avec le numéro {new_account_number}")
 
 if __name__ == "__main__":
     app = FinanceManagerApp()
