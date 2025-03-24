@@ -7,6 +7,8 @@ class LoginSignup(ctk.CTkFrame):  # Make it inherit from CTk (the main window)
     def __init__(self, master):
         super().__init__(master)
         self.master=master
+        ctk.set_appearance_mode("dark")
+        ctk.set_default_color_theme("dark-blue")
         self.create_widgets()
         self.pack(expand=True, fill="both")
 

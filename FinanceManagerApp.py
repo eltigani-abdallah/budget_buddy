@@ -19,7 +19,6 @@ class FinanceManagerApp(ctk.CTkFrame):
         super().__init__(master)
         self.master=master
         
-        
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
 
@@ -264,7 +263,7 @@ class FinanceManagerApp(ctk.CTkFrame):
             self.tree.insert("", "end", values=(t['date'], t['amount'], t['category'], t['type']))
 
     def refresh_overview(self):
-        self.balance_label.configure(text=f"{lang.translate(self.language, 'balance_label')} {self.accounts[self.current_account]:.2f} €")
+        pass
 
     def export_to_csv(self):
         transactions = []
