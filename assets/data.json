@@ -1,0 +1,10 @@
+{
+    "transactions": [],
+    "beneficiaries": {},
+    "current_user_email": "user1@exemple.com",
+    "accounts": {
+        "Main Account": 450,
+        "Savings Account": 1600,
+        "Business Account": 7500
+    }
+}

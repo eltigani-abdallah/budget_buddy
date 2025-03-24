@@ -9,8 +9,10 @@ import os
 import json
 from datetime import datetime
 from collections import defaultdict
+import accounts
 
 def on_close():
+    save_data(app)
     logout()
     print("shutting down...")
     app.quit()
@@ -25,6 +27,28 @@ def logout():
 def load_lang(langs):
     with open(langs, "r", encoding="utf-8") as file:
         return json.load(file)
+
+def load_data():
+    if os.path.exists("./assets/data.json"):
+        with open("./assets/data.json", "r", encoding="utf-8") as file:
+            data = json.load(file)
+            return (
+                data.get("transactions", []),
+                data.get("beneficiaries", {}),
+                data.get("current_user_email", ""),
+                data.get("accounts", {})
+            )
+    return [], {}, "", {}
+
+def save_data(app):
+    data = {
+        "transactions": app.transactions,
+        "beneficiaries": app.beneficiaries,
+        "current_user_email": app.current_user_email,
+        "accounts": app.accounts
+    }
+    with open("./assets/data.json", "w", encoding="utf-8") as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
 
 lang_dict = load_lang("./assets/lang.json")
 
@@ -59,16 +83,15 @@ class FinanceManagerApp(ctk.CTk):
         self.title("Finance Manager")
         self.geometry("1000x700")
 
-        self.accounts = {
-            "Main Account": 450,
-            "Savings Account": 1600,
-            "Business Account": 7500,
-        }
-        self.user_accounts = {}
+        self.transactions, self.beneficiaries, self.current_user_email, self.accounts = load_data()
+        # Si aucun compte n'est chargé, initialiser avec des comptes par défaut
+        if not self.accounts:
+            self.accounts = {
+                "Main Account": 450,
+                "Savings Account": 1600,
+                "Business Account": 7500,
+            }
         self.current_account = "Main Account"
-        self.transactions = []
-        self.beneficiaries = {}
-        self.current_user_email = "user1@example.com"  # Définir sur l'email de l'utilisateur connecté
         self.create_widgets()
         self.refresh_overview()
 
@@ -234,8 +257,9 @@ class FinanceManagerApp(ctk.CTk):
         # Calculer les totaux par catégorie
         category_totals = defaultdict(float)
         for transaction in user_transactions:
-            if transaction['type'] in ['Withdrawal', 'Transfer', 'Deposit']:  # Ne considérer que les dépenses
-                category_totals[transaction['category']] += float(transaction['amount'])
+            if transaction['type'] in ['Withdrawal', 'Transfer']:  # Ne considérer que les dépenses
+                if transaction['category'] in ["Bills", "Leisure", "Dining", "Travels", "Other Categories"]:
+                    category_totals[transaction['category']] += float(transaction['amount'])
 
         # Créer le diagramme en secteurs
         categories = list(category_totals.keys())
@@ -466,9 +490,8 @@ class FinanceManagerApp(ctk.CTk):
         """
         self.history_listbox.delete("1.0", ctk.END)  # Effacer le contenu actuel
         for transaction in self.transactions:
-            if transaction['user_email'] == self.current_user_email and transaction['type'] in ['Deposit', 'Withdrawal', 'Transfer']:
-                account_info = f"From: {transaction.get('from_account', 'N/A')} To: {transaction.get('to_account', 'N/A') if 'to_account' in transaction else transaction.get('to_beneficiary', 'N/A')}"
-                self.history_listbox.insert(ctk.END, f"{transaction['date']} - {transaction['description']} - {transaction['amount']} € - {account_info} - {transaction['category']} - {transaction['type']} - {self.current_user_email}\n")
+            account_info = f"From: {transaction.get('from_account', 'N/A')} To: {transaction.get('to_account', 'N/A') if 'to_account' in transaction else transaction.get('to_beneficiary', 'N/A')}"
+            self.history_listbox.insert(ctk.END, f"{transaction['date']} - {transaction['description']} - {transaction['amount']} € - {account_info} - {transaction['category']} - {transaction['type']} - {transaction.get('user_email', '')}\n")
 
     def refresh_overview(self):
         """

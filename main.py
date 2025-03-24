@@ -2,6 +2,8 @@ import loginSignup
 import FinanceManagerApp
 import customtkinter as ctk
 import sessionManager
+import banking
+import accounts
 
 class Mainapp(ctk.CTk):
     def __init__(self):
@@ -14,7 +16,7 @@ class Mainapp(ctk.CTk):
 
     def show_banking_app(self):
         self.login_frame.forget()
-        self.banking_frame=FinanceManagerApp.FinanceManagerApp(self)
+        self.banking_frame=banking.FinanceManagerApp().mainloop
 
 
 app=Mainapp()
