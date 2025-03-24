@@ -1,1 +1,2 @@
-ID,Reference,Description,Amount,Date,Type,Category,Sender,Receiver
+type,amount,date,description,category,from_account,to_account,to_beneficiary,user_email
+Transfer,10.0,2025-03-24,ezrezr,Other Categories,Main Account,,abcd13@gmail.com,abcd13@gmail.com
