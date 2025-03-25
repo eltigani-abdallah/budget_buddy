@@ -2,7 +2,7 @@ import customtkinter as ctk
 import mysql.connector
 from tkinter import messagebox
 import bcrypt
-import re # per
+import re 
 import os
 import subprocess
 from dotenv import load_dotenv

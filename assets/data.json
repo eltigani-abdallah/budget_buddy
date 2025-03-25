@@ -259,6 +259,46 @@
             "from_account": "Savings Account",
             "to_account": "Business Account",
             "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Withdrawal",
+            "amount": 2000.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Withdrawal",
+            "amount": 2000.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 2000.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 2000.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
         }
     ],
     "beneficiaries": {},

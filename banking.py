@@ -94,7 +94,6 @@ class FinanceManagerApp(ctk.CTk):
         self.current_account = "Main Account"
         self.create_widgets()
         self.refresh_overview()
-        self.update_email_label()  # Update the email label
 
     def create_widgets(self):
         """
@@ -105,10 +104,6 @@ class FinanceManagerApp(ctk.CTk):
 
         self.logout_button = ctk.CTkButton(top_frame, text=translate(self.language, "logout_button"), command=self.logout)
         self.logout_button.pack(side='left', padx=10)
-
-        # Add a label to display the user's email address
-        self.email_label = ctk.CTkLabel(top_frame, text=f"Email: {self.current_user_email}")
-        self.email_label.pack(side='right', padx=10)
 
         self.language_menu = ctk.CTkOptionMenu(top_frame, values=["french", "english", "russian", "korean"], command=self.change_language)
         self.language_menu.pack(side='right', padx=10)
