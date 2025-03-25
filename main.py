@@ -22,4 +22,3 @@ class Mainapp(ctk.CTk):
 app=Mainapp()
 app.protocol("WM_DELETE_WINDOW", sessionManager.on_close)
 app.mainloop()
-

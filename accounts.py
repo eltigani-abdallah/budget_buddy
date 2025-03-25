@@ -2,7 +2,7 @@ import customtkinter as ctk
 import mysql.connector
 from tkinter import messagebox
 import bcrypt
-import re
+import re # per
 import os
 import subprocess
 from dotenv import load_dotenv
@@ -14,8 +14,23 @@ dbpassword = os.getenv("pass")
 
 print("Login Module:", os.getcwd())
 
-# Function to validate password based on security criteria
 def validate_password(password):
+    """
+    Validate the password based on security criteria.
+
+    The password must meet the following criteria:
+    - At least 10 characters long
+    - Contains at least one uppercase letter
+    - Contains at least one lowercase letter
+    - Contains at least one digit
+    - Contains at least one special character from the set: @$!%*?_&-
+
+    Args:
+        password (str): The password to validate.
+
+    Returns:
+        bool: True if the password meets all criteria, False otherwise.
+    """
     if len(password) < 10:
         return False
     if not re.search(r'[A-Z]', password):
@@ -28,18 +43,47 @@ def validate_password(password):
         return False
     return True
 
-
-# Function to verify login credentials
 def verify_login(email, password):
+    """
+    Verify login credentials by checking the email and password against the database.
+
+    Args:
+        email (str): The email of the user.
+        password (str): The password of the user.
+
+    Returns:
+        bool: True if the credentials are valid, False otherwise.
+    """
     try:
         db = mysql.connector.connect(
             host="localhost",
             user="root",
-            password= dbpassword,
+            password=dbpassword,
             database="boom_budget",
         )
-        cursor = db.cursor()
-        cursor.execute("SELECT mot_de_passe FROM utilisateurs WHERE email = %s", (email,))
+        ''' 
+    Retrieves the password of a user from the database based on their email.
+
+    Parameters:
+    email (str): The email address of the user.
+    db (object): The database connection object.
+
+    Returns:
+    tuple or None: A tuple containing the user's password if the email exists, or None if the email is not found.
+
+    Process:
+    1. A cursor is created to execute SQL queries.
+    2. A SELECT query is executed to fetch the password for the given email.
+    3. The first result (if any) is retrieved using fetchone().
+    4. The cursor is closed to free resources.
+    5. The database connection is closed to ensure proper resource management.
+    
+    Note:
+    - The query uses parameterized SQL (`%s`) to prevent SQL injection.
+    - The returned value is a tuple containing the password or None if no user is found.
+    '''
+        cursor = db.cursor() 
+        cursor.execute("SELECT mot_de_passe FROM utilisateurs WHERE email = %s", (email,)) # select mdp ... lance une requettes SQL, paramètre de substitution utilisé pour éviter les injections SQL
         user = cursor.fetchone()
         cursor.close()
         db.close()
@@ -51,8 +95,20 @@ def verify_login(email, password):
         print(f"Error: {e}")
         return False
 
-# Function for user registration with password validation and hashing
 def register_user(first_name, last_name, email, password, confirm_password):
+    """
+    Register a new user with password validation and hashing.
+
+    Args:
+        first_name (str): The first name of the user.
+        last_name (str): The last name of the user.
+        email (str): The email of the user.
+        password (str): The password of the user.
+        confirm_password (str): The confirmed password of the user.
+
+    Returns:
+        None
+    """
     if not validate_password(password):
         messagebox.showerror("Error", "The password does not meet security requirements.")
         return
@@ -90,8 +146,16 @@ def register_user(first_name, last_name, email, password, confirm_password):
         print(f"Error: {e}")
         messagebox.showerror("Error", "Unable to register the user.")
 
-# Login function
 def on_login():
+    """
+    Handle the login process.
+
+    Retrieves the email and password from the input fields, verifies the credentials,
+    and proceeds to the next step if the login is successful.
+
+    Returns:
+        None
+    """
     email = entry1.get()
     password = entry2.get()
 
@@ -111,8 +175,16 @@ def on_login():
     else:
         messagebox.showerror("Error", "Incorrect email or password.")
 
-# Registration function
 def on_register():
+    """
+    Handle the registration process.
+
+    Retrieves user details from the input fields and registers the user if all
+    validations pass.
+
+    Returns:
+        None
+    """
     first_name = entry_first_name.get()
     last_name = entry_last_name.get()
     email = entry_email.get()
@@ -125,8 +197,13 @@ def on_register():
 
     register_user(first_name, last_name, email, password, confirm_password)
 
-# Function to toggle password visibility
 def toggle_password():
+    """
+    Toggle the visibility of the password fields.
+
+    Returns:
+        None
+    """
     if check_var.get():
         entry_password.configure(show="")
         entry_confirm_password.configure(show="")
@@ -142,8 +219,8 @@ app.title("Sign Up / Login Window")
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
-# Ajout du titre
-welcome_label = ctk.CTkLabel(master=app, text="Bienvenue dans votre banque, en toute simplicité. Boom_Budget", font=("Helvetica", 16, "bold"))
+# GUI
+welcome_label = ctk.CTkLabel(master=app, text="Boom_Budget", font=("Helvetica", 16, "bold"))
 welcome_label.pack(pady=10)
 
 # Login widgets

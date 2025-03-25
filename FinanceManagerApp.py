@@ -8,8 +8,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import dboperations
 import User
-import lang
 import sessionManager
+import lang
+import banking
 
 
 

@@ -1,10 +1,271 @@
 {
-    "transactions": [],
+    "transactions": [
+        {
+            "type": "Withdrawal",
+            "amount": 50.0,
+            "date": "2025-03-24",
+            "description": "fraises",
+            "category": "Dining",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Withdrawal",
+            "amount": 250.0,
+            "date": "2025-03-24",
+            "description": "manga",
+            "category": "Other Categories",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Transfer",
+            "amount": 500.0,
+            "date": "2025-03-25",
+            "description": "Transfert multiple",
+            "category": "Internal Transfer",
+            "from_account": "Savings Account",
+            "to_account": "Savings Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Transfer",
+            "amount": 500.0,
+            "date": "2025-03-25",
+            "description": "Transfert multiple",
+            "category": "Internal Transfer",
+            "from_account": "Savings Account",
+            "to_account": "Business Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Transfer",
+            "amount": 300.0,
+            "date": "2025-03-25",
+            "description": "Transfert multiple",
+            "category": "Internal Transfer",
+            "from_account": "Savings Account",
+            "to_account": "Savings Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Transfer",
+            "amount": 300.0,
+            "date": "2025-03-25",
+            "description": "Transfert multiple",
+            "category": "Internal Transfer",
+            "from_account": "Savings Account",
+            "to_account": "Business Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Deposit",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "",
+            "category": "",
+            "from_account": "Main Account",
+            "to_account": "Main Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Transfer",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "Transfert multiple",
+            "category": "Internal Transfer",
+            "from_account": "Savings Account",
+            "to_account": "Savings Account",
+            "user_email": "current_user@example.com"
+        },
+        {
+            "type": "Transfer",
+            "amount": 200.0,
+            "date": "2025-03-25",
+            "description": "Transfert multiple",
+            "category": "Internal Transfer",
+            "from_account": "Savings Account",
+            "to_account": "Business Account",
+            "user_email": "current_user@example.com"
+        }
+    ],
     "beneficiaries": {},
-    "current_user_email": "user1@exemple.com",
+    "current_user_email": "current_user@example.com",
     "accounts": {
-        "Main Account": 450,
-        "Savings Account": 1600,
-        "Business Account": 7500
+        "Main Account": 3750.0,
+        "Savings Account": 600.0,
+        "Business Account": 8500.0
     }
 }
