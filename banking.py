@@ -186,27 +186,28 @@ class FinanceManagerApp(ctk.CTk):
         self.date_label.grid(row=0, column=0, padx=5, pady=5)
         self.date_entry = DateEntry(self.search_frame, width=12, background='lightblue', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.date_entry.grid(row=0, column=1, padx=5, pady=5)
-        self.date_entry.set_date(None)  # Initialize the field with an empty value
+        self.date_entry.delete(0, 'end')  # Clear initial date
 
-        self.clear_date_button = ctk.CTkButton(self.search_frame, text="Clear", command=self.clear_date)
+        self.clear_date_button = ctk.CTkButton(self.search_frame, text="Clear", command=lambda: self.date_entry.delete(0, 'end'))
         self.clear_date_button.grid(row=0, column=2, padx=5, pady=5)
 
         self.start_date_label = ctk.CTkLabel(self.search_frame, text=translate(self.language, "start_date_label"))
         self.start_date_label.grid(row=1, column=0, padx=5, pady=5)
         self.start_date_entry = DateEntry(self.search_frame, width=12, background='lightblue', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.start_date_entry.grid(row=1, column=1, padx=5, pady=5)
+        self.start_date_entry.delete(0, 'end')  # Clear initial date
 
-        self.clear_start_date_button = ctk.CTkButton(self.search_frame, text="Clear", command=self.clear_start_date)
-        self.clear_start_date_button.grid(row=1, column=2, padx=5, pady=5)
+        self.clear_end_date_button = ctk.CTkButton(self.search_frame, text="Clear", command=lambda: self.end_date_entry.delete(0, 'end'))
+        self.clear_end_date_button.grid(row=2, column=2, padx=5, pady=5)
 
         self.end_date_label = ctk.CTkLabel(self.search_frame, text=translate(self.language, "end_date_label"))
         self.end_date_label.grid(row=2, column=0, padx=5, pady=5)
         self.end_date_entry = DateEntry(self.search_frame, width=12, background='lightblue', foreground='black', borderwidth=2, date_pattern='yyyy-mm-dd')
         self.end_date_entry.grid(row=2, column=1, padx=5, pady=5)
-        self.end_date_entry.set_date(None)  # Initialize the field with an empty value
+        self.end_date_entry.delete(0, 'end')  # Clear initial date
 
-        self.clear_end_date_button = ctk.CTkButton(self.search_frame, text="Clear", command=self.clear_end_date)
-        self.clear_end_date_button.grid(row=2, column=2, padx=5, pady=5)
+        self.clear_start_date_button = ctk.CTkButton(self.search_frame, text="Clear", command=lambda: self.start_date_entry.delete(0, 'end'))
+        self.clear_start_date_button.grid(row=1, column=2, padx=5, pady=5)
 
         self.min_amount_label = ctk.CTkLabel(self.search_frame, text=translate(self.language, "min_amount_label"))
         self.min_amount_label.grid(row=0, column=3, padx=5, pady=5)
